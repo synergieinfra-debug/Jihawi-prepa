@@ -63,6 +63,13 @@ nav button.on{color:var(--accent)}
 .q textarea{width:100%;min-height:70px;border:1px solid var(--line);border-radius:9px;padding:8px;font-family:inherit;font-size:.92rem;resize:vertical}
 .btn{background:var(--accent);color:#fff;border:0;border-radius:9px;padding:9px 14px;font-weight:600;font-size:.92rem;font-family:inherit;margin-top:6px}
 .btn.alt{background:var(--accent2)}
+.card.adm{border:1px dashed var(--accent)}
+.admg .inp,#adQ{text-transform:none;letter-spacing:0;font-size:.95rem}
+.admg{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}.admg .lab{display:block}.admg .inp{margin-top:2px}
+.adc,.adl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0;border-top:1px solid #eadfcf}.adc:first-child,.adl:first-child{border-top:0}
+.adc code,.adl code{font-size:1rem;font-weight:700;letter-spacing:.5px}.adl>div:first-child{flex:1;min-width:170px}.adl .acts{display:flex;gap:6px;flex-wrap:wrap}
+.adl .btn,.adc .btn{padding:6px 10px;font-size:.8rem;margin:0}.btn.wa{background:#25d366;color:#fff;text-decoration:none;display:inline-block}.btn.red{color:#b5452c;border-color:#b5452c}
+.st{font-size:.75rem;padding:2px 7px;border-radius:9px;background:#eee;color:#555;margin-left:4px}.st.on{background:#dff3e4;color:#1d6b3a}.st.off{background:#f9dcd6;color:#9b2f1a}
 .btn.ghost{background:none;color:var(--accent);border:1px solid var(--accent)}
 .btn.w{width:100%}
 .expl{display:none;margin-top:8px;background:#f1f7f7;border-left:4px solid var(--accent2);padding:8px 10px;border-radius:8px;font-size:.88rem}
@@ -141,7 +148,7 @@ nav button.on{color:var(--accent)}
 <body>
 <header>
   <button class="back" id="back" onclick="goBack()">‹</button>
-  <h1 id="title">Jihawi Prépa<small id="sub">1ʳᵉ année bac · Examen régional</small></h1>
+  <h1 id="title" onclick="titleTap()">Jihawi Prépa<small id="sub">1ʳᵉ année bac · Examen régional</small></h1>
 </header>
 <main id="main"></main>
 <div class="toast" id="toast"><span>Nouvelle version disponible.</span><button onclick="location.reload()">Actualiser</button></div>
@@ -883,6 +890,7 @@ function fmt(n){return (Math.round(n*10)/10).toString().replace('.',',');}
 function esc(s){return String(s).replace(/</g,'&lt;');}
 function cur(){return BAM.oeuvres[S.oeuvre];}
 
+var _tapN=0,_tapT=0;function titleTap(){var n=Date.now();if(n-_tapT>1500)_tapN=0;_tapT=n;if(++_tapN>=7){_tapN=0;adminLogin();}}
 function setTitle(t,s){$('title').childNodes[0].nodeValue=t;$('sub').textContent=s||'';}
 function go(view,opt,noHist){
   if(!noHist)S.hist.push({view:S.view,chap:S.chap});
@@ -902,6 +910,7 @@ function render(){
   var o=cur();
   if(S.view==='home')return renderHome(m);
   if(S.view==='licence')return renderLicence(m);
+  if(S.view==='admin')return renderAdmin(m);
   if(!o)return renderHome(m);
   setTitle(o.titre,o.auteur+' · '+o.genre);
   if(S.view==='oeuvre')m.innerHTML=o.fiche;
@@ -945,6 +954,7 @@ function renderHome(m){
   var p=load('prog',{}),tot=0,done=0;
   Object.keys(BAM.oeuvres).forEach(function(id){BAM.oeuvres[id].chapitres.forEach(function(c,i){tot++;if(p[id+'_'+i])done++;});});
   h+=licCard();
+  if(admKey())h+='<div class="card adm"><h2>Administration</h2><p class="tip">Visible uniquement sur cet appareil.</p><button class="btn w" onclick="go(\'admin\')">Gérer les codes de licence</button></div>';
   h+='<div class="card"><h2>Votre progression</h2><div class="stat"><div><b>'+done+'/'+tot+'</b><small>chapitres travaillés</small></div><div><b>'+(load('examBest',null)===null?'—':fmt(load('examBest',0))+'/20')+'</b><small>meilleur examen blanc</small></div></div></div>';
   m.innerHTML=h;refreshInstall();
 }
@@ -995,6 +1005,68 @@ function activate(){
       msg.textContent='Activation réussie !';setTimeout(function(){S.hist=[];go('home',null,true);},600);
     });
   }).catch(function(e){msg.textContent='✗ '+e.message;btn.disabled=false;});
+}
+
+/* ---------- Administration (réservée au propriétaire : clé enregistrée sur son appareil) ---------- */
+function admKey(){return load('adm',null);}
+function admPost(path,body){body=body||{};body.key=admKey();return fetch(API+path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json();});}
+function adminLogin(){
+  if(admKey()){go('admin');return;}
+  var k=prompt('Clé d\'administration :');if(!k)return;k=k.trim();
+  if(!navigator.onLine){alert('Connexion Internet nécessaire.');return;}
+  fetch(API+'/admin/verify',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({key:k})}).then(function(r){return r.json();})
+  .then(function(j){if(j.ok){store('adm',k);go('admin');}else alert(j.error||'Clé refusée');}).catch(function(){alert('Serveur injoignable');});
+}
+function adminLogout(){if(confirm('Retirer l\'accès administrateur de cet appareil ?')){store('adm',null);S.hist=[];go('home',null,true);}}
+function appUrl(){return location.origin+location.pathname.replace(/index\.html$/,'');}
+function waMsg(code,nom){return 'Bonjour'+(nom?' '+nom:'')+' 👋\nVoici votre code *Jihawi Prépa* (Français 1ʳᵉ bac) :\n\n*'+code+'*\n\n1) Ouvrez '+appUrl()+'\n2) Touchez « J\'ai un code · Activer », saisissez le code et votre prénom.\n3) Installez l\'application (menu ⋮ → Ajouter à l\'écran d\'accueil) : elle fonctionne ensuite hors connexion.\n\nValable toute l\'année scolaire, sur 2 appareils maximum. Bonne révision !';}
+function waLink(code,nom){return 'https://wa.me/?text='+encodeURIComponent(waMsg(code,nom));}
+function copyTxt(t,btn){var done=function(){if(btn){var o=btn.textContent;btn.textContent='Copié ✓';setTimeout(function(){btn.textContent=o;},1200);}};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){prompt('Copiez :',t);});else prompt('Copiez :',t);}
+function renderAdmin(m){
+  setTitle('Administration','Codes de licence');
+  var mois=['jan','fev','mar','avr','mai','juin','juil','aout','sept','oct','nov','dec'],d=new Date(),lot=mois[d.getMonth()]+'-'+d.getFullYear();
+  m.innerHTML='<div class="card"><h2>Générer des codes</h2><div class="admg">'
+   +'<label class="lab">Nombre<input id="adN" class="inp" type="number" value="5" min="1" max="100"></label>'
+   +'<label class="lab">Appareils<input id="adMax" class="inp" type="number" value="2" min="1" max="5"></label>'
+   +'<label class="lab">Jours<input id="adJ" class="inp" type="number" value="365" min="7" max="730"></label>'
+   +'<label class="lab">Lot<input id="adLot" class="inp" value="'+lot+'" maxlength="20"></label></div>'
+   +'<button class="btn w" id="adGen" onclick="adminGen()">Générer</button><div id="adMsg" class="tip" style="margin-top:8px"></div><div id="adNew"></div></div>'
+   +'<div class="card"><h2>Licences <span id="adCount" class="tip"></span></h2><div class="row"><input id="adQ" class="inp" placeholder="Rechercher (code, nom, lot)" oninput="adminFilter()" style="flex:1;margin:0"><button class="btn ghost" onclick="adminList()">Actualiser</button></div><div id="adList" class="tip" style="margin-top:8px">Chargement…</div></div>'
+   +'<div class="card"><button class="btn ghost w" onclick="adminLogout()">Quitter l\'administration</button></div>';
+  adminList();
+}
+function codeRow(c,nom){return '<div class="adc"><code>'+c+'</code><a class="btn wa" href="'+waLink(c,nom)+'" target="_blank" rel="noopener">WhatsApp</a><button class="btn ghost" onclick="copyTxt(\''+c+'\',this)">Copier</button></div>';}
+function adminGen(){
+  var n=+$('adN').value||1,btn=$('adGen'),msg=$('adMsg');btn.disabled=true;msg.textContent='Génération…';
+  admPost('/admin/codes',{n:n,max:+$('adMax').value||2,jours:+$('adJ').value||365,lot:$('adLot').value.trim()}).then(function(j){
+    btn.disabled=false;if(!j.codes){msg.textContent='✗ '+(j.error||'Erreur');return;}
+    msg.textContent=j.codes.length+' code(s) créé(s). Envoyez chacun à un élève :';
+    $('adNew').innerHTML=j.codes.map(function(c){return codeRow(c,'');}).join('')+'<button class="btn ghost w" onclick="copyTxt(\''+j.codes.join('\\n')+'\',this)">Copier tous les codes</button>';
+    adminList();
+  }).catch(function(){btn.disabled=false;msg.textContent='✗ Serveur injoignable';});
+}
+var _adAll=[];
+function adminList(){var el=$('adList');if(!el)return;el.textContent='Chargement…';
+  admPost('/admin/list').then(function(j){if(!Array.isArray(j)){el.textContent='✗ '+(j.error||'Erreur');return;}_adAll=j;adminFilter();}).catch(function(){el.textContent='✗ Serveur injoignable';});}
+function adminFilter(){
+  var q=($('adQ').value||'').toLowerCase(),el=$('adList');var L=_adAll.filter(function(l){return !q||(l.code+' '+(l.nom||'')+' '+(l.lot||'')).toLowerCase().indexOf(q)>=0;});
+  var act=_adAll.filter(function(l){return l.active&&!l.revoked;}).length;$('adCount').textContent=_adAll.length+' codes · '+act+' actifs';
+  if(!L.length){el.innerHTML='Aucun code.';return;}
+  L.sort(function(a,b){return (b.created||0)-(a.created||0);});
+  el.innerHTML=L.map(function(l){
+    var etat=l.revoked?'<span class="st off">désactivé</span>':l.active?'<span class="st on">actif · '+l.appareils+'/'+l.max+'</span>':'<span class="st">non utilisé</span>';
+    var exp=l.exp?' · exp. '+new Date(l.exp).toLocaleDateString('fr-MA'):'';
+    var acts=(!l.active&&!l.revoked?'<a class="btn wa" href="'+waLink(l.code,'')+'" target="_blank" rel="noopener">WhatsApp</a>':'')
+      +'<button class="btn ghost" onclick="copyTxt(\''+l.code+'\',this)">Copier</button>'
+      +(l.active?'<button class="btn ghost" onclick="adminAct(\'reset\',\''+l.code+'\')">Libérer appareils</button>':'')
+      +(l.revoked?'<button class="btn ghost" onclick="adminAct(\'unrevoke\',\''+l.code+'\')">Réactiver</button>':'<button class="btn ghost red" onclick="adminAct(\'revoke\',\''+l.code+'\')">Désactiver</button>');
+    return '<div class="adl"><div><code>'+l.code+'</code> '+etat+'<br><small>'+esc(l.nom||'—')+' · lot '+esc(l.lot||'—')+exp+'</small></div><div class="acts">'+acts+'</div></div>';
+  }).join('');
+}
+function adminAct(a,code){
+  var lib={reset:'Libérer les appareils de',revoke:'Désactiver',unrevoke:'Réactiver'}[a];if(!confirm(lib+' le code '+code+' ?'))return;
+  admPost('/admin/'+a,{code:code}).then(function(j){if(j.ok)adminList();else alert(j.error||'Erreur');}).catch(function(){alert('Serveur injoignable');});
 }
 /* ---------- PWA : installation + mise à jour ---------- */
 var deferredPrompt=null;
