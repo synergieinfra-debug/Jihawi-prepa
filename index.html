@@ -395,6 +395,110 @@ reg({
  +'</div>'
 });
 
+/* === bam/01-ch01-svg.js === */
+/* Illustrations enrichies (v2) pour La Boîte à merveilles, chapitre 1 — remplacent les SVG simples */
+(function(){
+var c=BAM.oeuvres.bam.chapitres[0];if(!c)return;
+/* 1. L'enfant solitaire à la fenêtre */
+c.episodes[0].svg='<svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg">'
++'<defs><linearGradient id="w1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1e3c9"/><stop offset="1" stop-color="#d9c4a0"/></linearGradient>'
++'<linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fb3c9"/><stop offset="1" stop-color="#dbe9ee"/></linearGradient>'
++'<radialGradient id="light1" cx=".7" cy=".35" r=".6"><stop offset="0" stop-color="#fff6dc" stop-opacity=".9"/><stop offset="1" stop-color="#fff6dc" stop-opacity="0"/></radialGradient>'
++'<linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0c9a2"/><stop offset="1" stop-color="#d9a97e"/></linearGradient>'
++'<linearGradient id="floor1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b89b72"/><stop offset="1" stop-color="#8d6f4b"/></linearGradient>'
++'<pattern id="zel" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#2f6f78"/><path d="M7 0 L14 7 L7 14 L0 7Z" fill="#e8d9b8"/><circle cx="7" cy="7" r="2" fill="#b5452c"/></pattern></defs>'
++'<rect width="360" height="220" fill="url(#w1)"/>'
++'<rect x="0" y="150" width="360" height="70" fill="url(#floor1)"/>'
++'<rect x="0" y="150" width="360" height="3" fill="#6b4f30" opacity=".5"/>'
++'<rect x="0" y="118" width="360" height="32" fill="url(#zel)" opacity=".85"/>'
+/* fenêtre en arc */
++'<path d="M215 150 V60 a45 45 0 0 1 90 0 V150Z" fill="#5a4330"/>'
++'<path d="M221 150 V62 a39 39 0 0 1 78 0 V150Z" fill="url(#sky1)"/>'
++'<g fill="#c9a97a" opacity=".9"><rect x="226" y="112" width="20" height="38"/><rect x="250" y="100" width="26" height="50"/><rect x="280" y="118" width="16" height="32"/></g>'
++'<g fill="#7a5a3a" opacity=".8"><rect x="232" y="120" width="6" height="9"/><rect x="258" y="110" width="7" height="10"/></g>'
++'<rect x="256" y="84" width="8" height="18" fill="#a8865a"/><path d="M254 84 h12 l-6 -6Z" fill="#a8865a"/>'
++'<g stroke="#3a2a1a" stroke-width="3"><line x1="260" y1="62" x2="260" y2="150"/><line x1="221" y1="105" x2="299" y2="105"/></g>'
++'<rect x="150" y="40" width="210" height="180" fill="url(#light1)"/>'
+/* tapis */
++'<ellipse cx="110" cy="200" rx="95" ry="14" fill="#8a3b2a"/><ellipse cx="110" cy="200" rx="80" ry="10" fill="#b5452c"/><ellipse cx="110" cy="200" rx="40" ry="5" fill="#d9a441" opacity=".6"/>'
+/* enfant assis, tête penchée, menton dans la main */
++'<g transform="translate(70,70)">'
++'<ellipse cx="42" cy="124" rx="44" ry="8" fill="#000" opacity=".15"/>'
++'<path d="M4 122 Q2 70 40 68 Q78 70 80 122Z" fill="#f4f0e6"/><path d="M4 122 Q2 70 40 68 Q50 70 52 122Z" fill="#fff" opacity=".6"/>'
++'<path d="M26 72 Q40 60 54 72 L52 120 L28 120Z" fill="#e9e3d6"/>'
+/* bras gauche posé, bras droit soutient le menton */
++'<path d="M10 100 q-8 14 10 18 l20 0" stroke="url(#skin)" stroke-width="11" fill="none" stroke-linecap="round"/>'
++'<path d="M74 96 q6 -22 -6 -40" stroke="url(#skin)" stroke-width="11" fill="none" stroke-linecap="round"/>'
++'<ellipse cx="66" cy="52" rx="8" ry="6" fill="#e8bd94"/>'
+/* tête */
++'<ellipse cx="44" cy="40" rx="23" ry="26" fill="url(#skin)"/>'
++'<path d="M21 36 Q24 8 46 10 Q70 10 68 38 Q62 22 46 20 Q30 22 21 36Z" fill="#2b1d12"/>'
++'<path d="M24 24 q10 -10 22 -8" stroke="#3d2a1a" stroke-width="2" fill="none"/>'
++'<ellipse cx="22" cy="42" rx="4" ry="6" fill="#d9a97e"/>'
+/* yeux tristes : paupières tombantes vers l extérieur */
++'<path d="M30 38 q6 -4 12 0" stroke="#2b1d12" stroke-width="2" fill="none"/><path d="M50 38 q6 -4 12 0" stroke="#2b1d12" stroke-width="2" fill="none"/>'
++'<ellipse cx="36" cy="42" rx="3.2" ry="3.6" fill="#fff"/><ellipse cx="56" cy="42" rx="3.2" ry="3.6" fill="#fff"/>'
++'<circle cx="37" cy="43" r="2.2" fill="#2b1d12"/><circle cx="57" cy="43" r="2.2" fill="#2b1d12"/><circle cx="37.8" cy="42.2" r=".7" fill="#fff"/><circle cx="57.8" cy="42.2" r=".7" fill="#fff"/>'
++'<path d="M32 36 l8 -3" stroke="#2b1d12" stroke-width="1.6"/><path d="M60 36 l-8 -3" stroke="#2b1d12" stroke-width="1.6"/>'
++'<path d="M45 50 q1 4 -2 6" stroke="#b5825a" stroke-width="1.3" fill="none"/>'
++'<path d="M40 58 q5 -2 10 0" stroke="#8a4b3a" stroke-width="1.6" fill="none"/>'
++'<ellipse cx="30" cy="50" rx="4" ry="2" fill="#e8a088" opacity=".45"/><ellipse cx="60" cy="50" rx="4" ry="2" fill="#e8a088" opacity=".45"/>'
++'</g>'
+/* chat endormi */
++'<g transform="translate(14,150)"><ellipse cx="30" cy="30" rx="30" ry="12" fill="#4a4a4a"/><ellipse cx="30" cy="30" rx="22" ry="9" fill="#5e5e5e"/><circle cx="52" cy="22" r="10" fill="#4a4a4a"/><path d="M45 14 l2 -9 l6 6Z M53 13 l5 -8 l2 9Z" fill="#4a4a4a"/><path d="M48 23 q2 2 4 0 M54 23 q2 2 4 0" stroke="#111" stroke-width="1.2" fill="none"/><path d="M2 32 q-10 -12 4 -18" stroke="#4a4a4a" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="44" cy="26" rx="2" ry="1" fill="#e8a088"/></g>'
+/* la boîte fermée, posée près de lui */
++'<g transform="translate(170,165)"><path d="M0 12 L34 12 L34 34 L0 34Z" fill="#8a5a2e"/><path d="M0 12 L8 4 L42 4 L34 12Z" fill="#a97444"/><path d="M34 12 L42 4 L42 26 L34 34Z" fill="#6b4320"/><rect x="14" y="18" width="6" height="6" fill="#d9a441"/></g>'
++'<text x="180" y="212" text-anchor="middle" font-size="10" fill="#f3e6c9" font-style="italic">« Je n\'avais pas d\'ami. »</text>'
++'</svg>';
+c.episodes[0].cap="Sidi Mohammed, six ans : la lumière de la fenêtre, le regard ailleurs, la boîte à portée de main";
+
+/* 3. Le bain maure */
+c.episodes[2].svg='<svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg">'
++'<defs><linearGradient id="hw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f7f86"/><stop offset=".6" stop-color="#8aa7ad"/><stop offset="1" stop-color="#b7cfd4"/></linearGradient>'
++'<radialGradient id="steam" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
++'<radialGradient id="lamp" cx=".5" cy="0" r=".9"><stop offset="0" stop-color="#ffd27a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>'
++'<linearGradient id="wet" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9d0b4"/><stop offset="1" stop-color="#b98c6a"/></linearGradient>'
++'<linearGradient id="skin2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0c9a2"/><stop offset="1" stop-color="#d9a97e"/></linearGradient></defs>'
++'<rect width="360" height="220" fill="url(#hw)"/>'
+/* coupole percée d étoiles de lumière */
++'<path d="M0 90 Q180 -40 360 90 V0 H0Z" fill="#46636a"/>'
++'<g fill="#fff3c4" opacity=".9"><circle cx="120" cy="34" r="4"/><circle cx="160" cy="22" r="4"/><circle cx="200" cy="22" r="4"/><circle cx="240" cy="34" r="4"/><circle cx="180" cy="42" r="3"/></g>'
++'<g stroke="#fff3c4" stroke-width="14" opacity=".12"><line x1="160" y1="22" x2="120" y2="220"/><line x1="200" y1="22" x2="240" y2="220"/><line x1="180" y1="42" x2="180" y2="220"/></g>'
+/* arcades */
++'<g fill="#3e5a61"><path d="M-10 220 V120 a45 45 0 0 1 90 0 V220Z"/><path d="M280 220 V120 a45 45 0 0 1 90 0 V220Z"/></g>'
++'<g fill="#2f474d"><path d="M0 220 V124 a35 35 0 0 1 70 0 V220Z"/><path d="M290 220 V124 a35 35 0 0 1 70 0 V220Z"/></g>'
+/* sol mouillé et reflets */
++'<rect x="0" y="180" width="360" height="40" fill="#6f8f95"/><rect x="0" y="180" width="360" height="40" fill="url(#lamp)" opacity=".5"/>'
+/* silhouettes de femmes, dos et profils, dans la vapeur */
++'<g fill="#7d5a45" opacity=".85"><ellipse cx="110" cy="175" rx="28" ry="36"/><circle cx="110" cy="128" r="16"/><path d="M96 120 q14 -16 28 0 q-4 -10 -14 -10 q-10 0 -14 10Z" fill="#2b1d12"/></g>'
++'<g fill="#8a6a55" opacity=".8"><ellipse cx="250" cy="172" rx="30" ry="40"/><circle cx="250" cy="122" r="17"/><path d="M233 118 q17 -18 34 0 q-5 -11 -17 -11 q-12 0 -17 11Z" fill="#2b1d12"/><path d="M276 150 l22 -28" stroke="#8a6a55" stroke-width="12" stroke-linecap="round"/></g>'
++'<g fill="#6e4f3c" opacity=".55"><ellipse cx="40" cy="190" rx="22" ry="26"/><circle cx="40" cy="155" r="13"/><ellipse cx="320" cy="192" rx="22" ry="26"/><circle cx="322" cy="157" r="13"/></g>'
+/* seaux renversés, eau */
++'<g><ellipse cx="70" cy="206" rx="16" ry="6" fill="#4a3a2a"/><path d="M56 206 l4 -22 h20 l4 22Z" fill="#8a6d3b"/><ellipse cx="70" cy="184" rx="14" ry="5" fill="#a8865a"/><path d="M88 200 q20 -6 40 6" stroke="#cfe6ea" stroke-width="3" fill="none" opacity=".7"/></g>'
++'<g><ellipse cx="300" cy="208" rx="16" ry="6" fill="#4a3a2a"/><path d="M286 208 l4 -22 h20 l4 22Z" fill="#8a6d3b"/><ellipse cx="300" cy="186" rx="14" ry="5" fill="#a8865a"/></g>'
+/* l enfant au centre, recroquevillé, effrayé */
++'<g transform="translate(150,120)">'
++'<ellipse cx="30" cy="92" rx="34" ry="7" fill="#000" opacity=".2"/>'
++'<path d="M8 90 Q6 52 30 50 Q54 52 52 90Z" fill="url(#skin2)"/>'
++'<path d="M2 78 q6 -18 18 -14" stroke="url(#skin2)" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M58 78 q-6 -18 -18 -14" stroke="url(#skin2)" stroke-width="9" fill="none" stroke-linecap="round"/>'
++'<ellipse cx="30" cy="34" rx="19" ry="21" fill="url(#skin2)"/>'
++'<path d="M12 30 Q14 8 30 8 Q46 8 48 30 Q42 18 30 17 Q18 18 12 30Z" fill="#2b1d12"/>'
+/* grands yeux écarquillés, sourcils levés, bouche ouverte */
++'<path d="M18 26 q6 -5 11 -1" stroke="#2b1d12" stroke-width="2" fill="none"/><path d="M42 26 q-6 -5 -11 -1" stroke="#2b1d12" stroke-width="2" fill="none"/>'
++'<ellipse cx="23" cy="34" rx="4.5" ry="5.5" fill="#fff"/><ellipse cx="37" cy="34" rx="4.5" ry="5.5" fill="#fff"/>'
++'<circle cx="23" cy="35" r="2.6" fill="#2b1d12"/><circle cx="37" cy="35" r="2.6" fill="#2b1d12"/><circle cx="24" cy="34" r=".8" fill="#fff"/><circle cx="38" cy="34" r=".8" fill="#fff"/>'
++'<ellipse cx="30" cy="47" rx="3.5" ry="4.5" fill="#6b2a22"/><ellipse cx="30" cy="46" rx="2.2" ry="2" fill="#fff" opacity=".8"/>'
++'<ellipse cx="16" cy="40" rx="3.5" ry="2" fill="#e8a088" opacity=".5"/><ellipse cx="44" cy="40" rx="3.5" ry="2" fill="#e8a088" opacity=".5"/>'
++'<path d="M10 46 q-4 4 -2 10 M50 46 q4 4 2 10" stroke="#9fc3cc" stroke-width="1.5" fill="none"/>'
++'</g>'
+/* nappes de vapeur */
++'<ellipse cx="90" cy="100" rx="70" ry="30" fill="url(#steam)"/><ellipse cx="270" cy="80" rx="80" ry="34" fill="url(#steam)"/><ellipse cx="180" cy="200" rx="120" ry="26" fill="url(#steam)"/>'
++'<ellipse cx="180" cy="60" rx="140" ry="40" fill="url(#steam)" opacity=".6"/>'
++'<text x="180" y="18" text-anchor="middle" font-size="11" fill="#f3e6c9" font-weight="700" opacity=".9">Vapeur, cris, corps inconnus</text>'
++'</svg>';
+c.episodes[2].cap="Le hammam : sous la coupole percée d'étoiles, l'enfant perdu au milieu de silhouettes qui crient";
+})();
+
 /* === bam/01-ch01.js === */
 addChap('bam',{
  titre:"Entrée dans l'œuvre",
