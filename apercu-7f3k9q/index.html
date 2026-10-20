@@ -161,6 +161,150 @@ function addAr(oid,i,arr){var c=BAM.oeuvres[oid].chapitres[i];if(c)c.ar=arr;}
 function addLocked(oid,l){var o=BAM.oeuvres[oid];o.locked=o.locked||[];o.locked.push(l);}
 function addRedac(oid,list){BAM.oeuvres[oid].redactions=list;}
 
+/* === _lib/00-illus.js === */
+/* Bibliothèque d'illustration Jihawi (SVG vectoriel enrichi) — personnages expressifs, décors, accessoires.
+   Toutes les fonctions renvoient des chaînes SVG. Scène standard : viewBox 0 0 360 220. */
+var I=(function(){
+ var uid=0;function id(p){return p+(++uid);}
+ var SK={clair:['#f3d2ad','#dcae84'],moyen:['#e6b98f','#c9946a'],mat:['#c98f63','#a66f49'],fonce:['#8d5a3b','#6b4128']};
+ function grad(gid,a,b,vert){return '<linearGradient id="'+gid+'" x1="0" y1="0" x2="'+(vert?0:1)+'" y2="'+(vert?1:0)+'"><stop offset="0" stop-color="'+a+'"/><stop offset="1" stop-color="'+b+'"/></linearGradient>';}
+ function rad(gid,c,o1,o2){return '<radialGradient id="'+gid+'" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="'+c+'" stop-opacity="'+(o1==null?.8:o1)+'"/><stop offset="1" stop-color="'+c+'" stop-opacity="'+(o2||0)+'"/></radialGradient>';}
+ /* ---------- visages ---------- */
+ function face(o){ // o: expr, skin [light,dark], hair, hairstyle, beard, size (rayon ~ 20), veil
+   var r=o.r||20,s=o.skin,h='',e=o.expr||'neutre',hc=o.hair||'#2b1d12';
+   var g=id('sk');h+='<defs>'+grad(g,s[0],s[1],1)+'</defs>';
+   // voile (derrière la tête)
+   if(o.hairstyle==='voile')h+='<path d="M'+(-r*1.5)+' '+(r*2.4)+' L'+(-r*1.25)+' '+(-r*.2)+' Q0 '+(-r*1.75)+' '+(r*1.25)+' '+(-r*.2)+' L'+(r*1.5)+' '+(r*2.4)+'Z" fill="'+(o.veil||'#1f6f78')+'"/><path d="M'+(-r*1.5)+' '+(r*2.4)+' L'+(-r*1.25)+' '+(-r*.2)+' Q'+(-r*.6)+' '+(-r*1.2)+' 0 '+(-r*1.35)+' L0 '+(r*2.4)+'Z" fill="#fff" opacity=".12"/>';
+   h+='<ellipse cx="0" cy="0" rx="'+r+'" ry="'+(r*1.12)+'" fill="url(#'+g+')"/>';
+   // oreilles
+   h+='<ellipse cx="'+(-r)+'" cy="'+(r*.1)+'" rx="'+(r*.18)+'" ry="'+(r*.28)+'" fill="'+s[1]+'"/><ellipse cx="'+r+'" cy="'+(r*.1)+'" rx="'+(r*.18)+'" ry="'+(r*.28)+'" fill="'+s[1]+'"/>';
+   // cheveux
+   var hs=o.hairstyle||'court';
+   if(hs==='court')h+='<path d="M'+(-r)+' '+(-r*.2)+' Q'+(-r*.9)+' '+(-r*1.35)+' 0 '+(-r*1.3)+' Q'+(r*.9)+' '+(-r*1.35)+' '+r+' '+(-r*.2)+' Q'+(r*.7)+' '+(-r*.8)+' 0 '+(-r*.85)+' Q'+(-r*.7)+' '+(-r*.8)+' '+(-r)+' '+(-r*.2)+'Z" fill="'+hc+'"/>';
+   else if(hs==='voile')h+='<path d="M'+(-r*1.02)+' '+(r*.1)+' Q'+(-r*1.0)+' '+(-r*1.2)+' 0 '+(-r*1.25)+' Q'+(r*1.0)+' '+(-r*1.2)+' '+(r*1.02)+' '+(r*.1)+' Q'+(r*.75)+' '+(-r*.6)+' 0 '+(-r*.72)+' Q'+(-r*.75)+' '+(-r*.6)+' '+(-r*1.02)+' '+(r*.1)+'Z" fill="'+(o.veil||'#1f6f78')+'"/><path d="M'+(-r*.7)+' '+(-r*.55)+' Q0 '+(-r*.95)+' '+(r*.7)+' '+(-r*.55)+'" stroke="'+hc+'" stroke-width="3" fill="none"/>';
+   else if(hs==='long')h+='<path d="M'+(-r*1.05)+' '+(r*.9)+' L'+(-r*1.05)+' '+(-r*.3)+' Q0 '+(-r*1.45)+' '+(r*1.05)+' '+(-r*.3)+' L'+(r*1.05)+' '+(r*.9)+' Q'+(r*.6)+' '+(r*.3)+' '+(r*.55)+' '+(-r*.45)+' Q0 '+(-r*.75)+' '+(-r*.55)+' '+(-r*.45)+' Q'+(-r*.6)+' '+(r*.3)+' '+(-r*1.05)+' '+(r*.9)+'Z" fill="'+hc+'"/>';
+   else if(hs==='fez')h+='<path d="M'+(-r*.85)+' '+(-r*.6)+' L'+(-r*.7)+' '+(-r*1.5)+' L'+(r*.7)+' '+(-r*1.5)+' L'+(r*.85)+' '+(-r*.6)+'Z" fill="#b5452c"/><line x1="'+(r*.1)+'" y1="'+(-r*1.5)+'" x2="'+(r*.5)+'" y2="'+(-r*.9)+'" stroke="#2b1d12" stroke-width="1.5"/>';
+   else if(hs==='turban')h+='<path d="M'+(-r*1.05)+' '+(-r*.3)+' Q0 '+(-r*1.7)+' '+(r*1.05)+' '+(-r*.3)+' Q0 '+(-r*.9)+' '+(-r*1.05)+' '+(-r*.3)+'Z" fill="'+(o.turban||'#f3ecdc')+'"/><path d="M'+(-r*.9)+' '+(-r*.6)+' Q0 '+(-r*1.1)+' '+(r*.9)+' '+(-r*.6)+'" stroke="#d8cdb6" fill="none" stroke-width="1.5"/>';
+   else if(hs==='chauve')h+='<path d="M'+(-r)+' '+(-r*.2)+' Q'+(-r*.9)+' '+(-r*.9)+' '+(-r*.5)+' '+(-r*.9)+'" stroke="'+hc+'" stroke-width="4" fill="none"/><path d="M'+r+' '+(-r*.2)+' Q'+(r*.9)+' '+(-r*.9)+' '+(r*.5)+' '+(-r*.9)+'" stroke="'+hc+'" stroke-width="4" fill="none"/>';
+   else if(hs==='blanc')h+='<path d="M'+(-r)+' '+(-r*.2)+' Q'+(-r*.9)+' '+(-r*1.35)+' 0 '+(-r*1.3)+' Q'+(r*.9)+' '+(-r*1.35)+' '+r+' '+(-r*.2)+' Q'+(r*.7)+' '+(-r*.8)+' 0 '+(-r*.85)+' Q'+(-r*.7)+' '+(-r*.8)+' '+(-r)+' '+(-r*.2)+'Z" fill="#d8d2c4"/>';
+   if(o.beard)h+='<path d="M'+(-r*.75)+' '+(r*.35)+' Q0 '+(r*1.9)+' '+(r*.75)+' '+(r*.35)+' Q'+(r*.4)+' '+(r*.9)+' 0 '+(r*.95)+' Q'+(-r*.4)+' '+(r*.9)+' '+(-r*.75)+' '+(r*.35)+'Z" fill="'+(o.beard===true?hc:o.beard)+'"/>';
+   // expressions
+   var ex=r*.42,ey=-r*.05,er=r*.17,bw=2;
+   var brow={neutre:['M-.62 -.32 q.2 -.1 .4 -.04','M.62 -.32 q-.2 -.1 -.4 -.04'],
+     triste:['M-.6 -.3 q.2 -.16 .42 -.06','M.6 -.3 q-.2 -.16 -.42 -.06'],
+     peur:['M-.62 -.42 q.22 -.18 .44 -.1','M.62 -.42 q-.22 -.18 -.44 -.1'],
+     colere:['M-.64 -.42 q.24 .02 .42 .14','M.64 -.42 q-.24 .02 -.42 .14'],
+     joie:['M-.62 -.36 q.2 -.1 .4 -.06','M.62 -.36 q-.2 -.1 -.4 -.06'],
+     severe:['M-.64 -.36 q.24 -.02 .42 .1','M.64 -.36 q-.24 -.02 -.42 .1'],
+     pleur:['M-.6 -.3 q.2 -.18 .42 -.08','M.6 -.3 q-.2 -.18 -.42 -.08'],
+     surprise:['M-.62 -.44 q.2 -.14 .4 -.1','M.62 -.44 q-.2 -.14 -.4 -.1'],
+     serein:['M-.62 -.34 q.2 -.08 .4 -.04','M.62 -.34 q-.2 -.08 -.4 -.04']}[e]||['M-.62 -.32 q.2 -.1 .4 -.04','M.62 -.32 q-.2 -.1 -.4 -.04'];
+   h+='<g stroke="'+hc+'" stroke-width="'+bw+'" fill="none" stroke-linecap="round" transform="scale('+r+')"><path d="'+brow[0]+'" stroke-width="'+(bw/r)+'"/><path d="'+brow[1]+'" stroke-width="'+(bw/r)+'"/></g>';
+   var open=(e==='peur'||e==='surprise')?1.35:(e==='serein'||e==='joie')?.9:1,closed=(e==='pleur'&&o.yeuxFermes);
+   if(e==='serein'&&o.yeuxFermes||closed){h+='<path d="M'+(-ex-er)+' '+ey+' q'+er+' '+(er*.9)+' '+(er*2)+' 0 M'+(ex-er)+' '+ey+' q'+er+' '+(er*.9)+' '+(er*2)+' 0" stroke="'+hc+'" stroke-width="1.6" fill="none"/>';}
+   else{
+     h+='<ellipse cx="'+(-ex)+'" cy="'+ey+'" rx="'+(er*open)+'" ry="'+(er*1.2*open)+'" fill="#fff"/><ellipse cx="'+ex+'" cy="'+ey+'" rx="'+(er*open)+'" ry="'+(er*1.2*open)+'" fill="#fff"/>';
+     var px=o.regard||0;
+     h+='<circle cx="'+(-ex+px)+'" cy="'+(ey+1)+'" r="'+(er*.62)+'" fill="#2b1d12"/><circle cx="'+(ex+px)+'" cy="'+(ey+1)+'" r="'+(er*.62)+'" fill="#2b1d12"/>';
+     h+='<circle cx="'+(-ex+px+1)+'" cy="'+ey+'" r="'+(er*.22)+'" fill="#fff"/><circle cx="'+(ex+px+1)+'" cy="'+ey+'" r="'+(er*.22)+'" fill="#fff"/>';
+     if(e==='colere'||e==='severe')h+='<path d="M'+(-ex-er)+' '+(ey-er*.9)+' l'+(er*2)+' '+(er*.5)+' M'+(ex+er)+' '+(ey-er*.9)+' l'+(-er*2)+' '+(er*.5)+'" stroke="'+s[1]+'" stroke-width="2.5"/>';
+     if(e==='triste')h+='<path d="M'+(-ex-er)+' '+(ey-er*.5)+' q'+er+' -'+(er*.4)+' '+(er*2)+' 0 M'+(ex+er)+' '+(ey-er*.5)+' q-'+er+' -'+(er*.4)+' -'+(er*2)+' 0" stroke="'+s[1]+'" stroke-width="2.2"/>';
+   }
+   // nez
+   h+='<path d="M0 '+(r*.15)+' q'+(r*.1)+' '+(r*.25)+' -'+(r*.08)+' '+(r*.32)+'" stroke="'+s[1]+'" stroke-width="1.3" fill="none"/>';
+   // bouche
+   var my=r*.62,mw=r*.28;
+   var mouth={neutre:'<path d="M'+(-mw)+' '+my+' q'+mw+' '+(r*.08)+' '+(mw*2)+' 0" stroke="#8a4b3a" stroke-width="1.6" fill="none"/>',
+     triste:'<path d="M'+(-mw)+' '+(my+2)+' q'+mw+' -'+(r*.18)+' '+(mw*2)+' 0" stroke="#8a4b3a" stroke-width="1.6" fill="none"/>',
+     pleur:'<path d="M'+(-mw)+' '+(my+2)+' q'+mw+' -'+(r*.22)+' '+(mw*2)+' 0" stroke="#8a4b3a" stroke-width="1.6" fill="none"/><path d="M'+(-ex)+' '+(ey+er*1.4)+' q-2 '+(r*.4)+' 0 '+(r*.6)+' M'+ex+' '+(ey+er*1.4)+' q2 '+(r*.4)+' 0 '+(r*.6)+'" stroke="#9fc3cc" stroke-width="1.8" fill="none"/>',
+     peur:'<ellipse cx="0" cy="'+(my+1)+'" rx="'+(mw*.7)+'" ry="'+(r*.2)+'" fill="#6b2a22"/><ellipse cx="0" cy="'+(my-1)+'" rx="'+(mw*.45)+'" ry="'+(r*.08)+'" fill="#fff" opacity=".8"/>',
+     surprise:'<ellipse cx="0" cy="'+(my+1)+'" rx="'+(mw*.5)+'" ry="'+(r*.16)+'" fill="#6b2a22"/>',
+     colere:'<path d="M'+(-mw)+' '+(my+1)+' q'+mw+' -'+(r*.14)+' '+(mw*2)+' 0" stroke="#6b2a22" stroke-width="2.2" fill="none"/><path d="M'+(-mw*.7)+' '+(my-1)+' l'+(mw*1.4)+' 0" stroke="#fff" stroke-width="1.5"/>',
+     joie:'<path d="M'+(-mw*1.1)+' '+(my-1)+' q'+(mw*1.1)+' '+(r*.3)+' '+(mw*2.2)+' 0Z" fill="#6b2a22"/><path d="M'+(-mw*.8)+' '+my+' q'+(mw*.8)+' '+(r*.05)+' '+(mw*1.6)+' 0" stroke="#fff" stroke-width="2"/>',
+     severe:'<path d="M'+(-mw)+' '+(my+1)+' l'+(mw*2)+' 0" stroke="#6b2a22" stroke-width="1.8"/>',
+     serein:'<path d="M'+(-mw*.9)+' '+my+' q'+(mw*.9)+' '+(r*.14)+' '+(mw*1.8)+' 0" stroke="#8a4b3a" stroke-width="1.6" fill="none"/>'}[e]||'';
+   h+=mouth;
+   if(e==='joie'||e==='peur'||e==='pleur'||e==='triste')h+='<ellipse cx="'+(-r*.62)+'" cy="'+(r*.32)+'" rx="'+(r*.2)+'" ry="'+(r*.1)+'" fill="#e8a088" opacity=".45"/><ellipse cx="'+(r*.62)+'" cy="'+(r*.32)+'" rx="'+(r*.2)+'" ry="'+(r*.1)+'" fill="#e8a088" opacity=".45"/>';
+   return h;
+ }
+ /* ---------- personnage complet ---------- */
+ // o: x,y (pied/centre bas), h (hauteur totale ~120), skin ('clair'...), dress, dress2, expr, hairstyle, hair, beard, pose ('debout','assis','genoux','accroupi'), arms ('bas','leve','pointe','croise','hanches','tend','priere','visage'), flip, enfant(bool), accessoire svg string in hands
+ function person(o){
+   var H=o.h||120,r=H*.115,s=SK[o.skin||'moyen'],d=o.dress||'#1f6f78',d2=o.dress2||shade(d,-25),pose=o.pose||'debout';
+   var g=id('dr'),h='<g transform="translate('+o.x+','+o.y+')'+(o.flip?' scale(-1,1)':'')+'">';
+   h+='<defs>'+grad(g,d,d2,1)+'</defs>';
+   h+='<ellipse cx="0" cy="2" rx="'+(H*.3)+'" ry="'+(H*.045)+'" fill="#000" opacity=".16"/>';
+   var bodyTop=-H*.62,bodyBot=0;
+   if(pose==='assis'){bodyTop=-H*.5;h+='<rect x="'+(-H*.1)+'" y="'+(-H*.16)+'" width="'+(H*.5)+'" height="'+(H*.16)+'" rx="'+(H*.07)+'" fill="'+d2+'"/><rect x="'+(H*.3)+'" y="'+(-H*.1)+'" width="'+(H*.12)+'" height="'+(H*.1)+'" rx="3" fill="'+s[1]+'"/><path d="M'+(-H*.24)+' 0 Q'+(-H*.28)+' '+bodyTop+' 0 '+(bodyTop-4)+' Q'+(H*.28)+' '+bodyTop+' '+(H*.24)+' '+(-H*.12)+' L'+(H*.22)+' 0Z" fill="url(#'+g+')"/>';}
+   else if(pose==='genoux'){bodyTop=-H*.52;h+='<path d="M'+(-H*.22)+' 0 Q'+(-H*.26)+' '+bodyTop+' 0 '+(bodyTop-4)+' Q'+(H*.26)+' '+bodyTop+' '+(H*.26)+' '+(-H*.08)+' L'+(H*.3)+' 0Z" fill="url(#'+g+')"/>';}
+   else if(pose==='accroupi'){bodyTop=-H*.42;h+='<ellipse cx="0" cy="'+(bodyTop/2)+'" rx="'+(H*.28)+'" ry="'+(-bodyTop/2+2)+'" fill="url(#'+g+')"/>';}
+   else{h+='<path d="M'+(-H*.2)+' 0 Q'+(-H*.24)+' '+bodyTop+' 0 '+(bodyTop-4)+' Q'+(H*.24)+' '+bodyTop+' '+(H*.2)+' 0Z" fill="url(#'+g+')"/>';}
+   // pli central / ceinture
+   h+='<path d="M0 '+(bodyTop+6)+' L0 '+(bodyBot-4)+'" stroke="'+d2+'" stroke-width="1.2" opacity=".6"/>';
+   if(o.ceinture)h+='<path d="M'+(-H*.2)+' '+(bodyTop+H*.22)+' Q0 '+(bodyTop+H*.26)+' '+(H*.2)+' '+(bodyTop+H*.22)+'" stroke="'+o.ceinture+'" stroke-width="4" fill="none"/>';
+   // bras
+   var sh=bodyTop+H*.08,aw=H*.075,a=o.arms||'bas',sk=id('sa');h+='<defs>'+grad(sk,s[0],s[1],1)+'</defs>';
+   var arm=function(dpath){return '<path d="'+dpath+'" stroke="url(#'+sk+')" stroke-width="'+aw+'" fill="none" stroke-linecap="round"/>';};
+   var L=-H*.2,R=H*.2;
+   if(a==='bas'){h+=arm('M'+L+' '+sh+' q-'+(H*.08)+' '+(H*.18)+' -'+(H*.04)+' '+(H*.34))+arm('M'+R+' '+sh+' q'+(H*.08)+' '+(H*.18)+' '+(H*.04)+' '+(H*.34));}
+   else if(a==='leve'){h+=arm('M'+L+' '+sh+' q-'+(H*.12)+' -'+(H*.14)+' -'+(H*.06)+' -'+(H*.32))+arm('M'+R+' '+sh+' q'+(H*.12)+' -'+(H*.14)+' '+(H*.06)+' -'+(H*.32));}
+   else if(a==='pointe'){h+=arm('M'+L+' '+sh+' q-'+(H*.08)+' '+(H*.18)+' -'+(H*.04)+' '+(H*.34))+arm('M'+R+' '+sh+' l'+(H*.3)+' -'+(H*.1));}
+   else if(a==='croise'){h+=arm('M'+L+' '+sh+' q'+(H*.05)+' '+(H*.2)+' '+(H*.3)+' '+(H*.16))+arm('M'+R+' '+sh+' q-'+(H*.05)+' '+(H*.2)+' -'+(H*.3)+' '+(H*.16));}
+   else if(a==='hanches'){h+=arm('M'+L+' '+sh+' q-'+(H*.14)+' '+(H*.1)+' -'+(H*.02)+' '+(H*.26))+arm('M'+R+' '+sh+' q'+(H*.14)+' '+(H*.1)+' '+(H*.02)+' '+(H*.26));}
+   else if(a==='tend'){h+=arm('M'+L+' '+sh+' l-'+(H*.28)+' '+(H*.06))+arm('M'+R+' '+sh+' l'+(H*.28)+' '+(H*.06));}
+   else if(a==='priere'){h+=arm('M'+L+' '+sh+' q'+(H*.02)+' '+(H*.14)+' '+(H*.16)+' '+(H*.12))+arm('M'+R+' '+sh+' q-'+(H*.02)+' '+(H*.14)+' -'+(H*.16)+' '+(H*.12));}
+   else if(a==='visage'){h+=arm('M'+L+' '+sh+' q-'+(H*.02)+' -'+(H*.1)+' '+(H*.1)+' -'+(H*.22))+arm('M'+R+' '+sh+' q'+(H*.02)+' -'+(H*.1)+' -'+(H*.1)+' -'+(H*.22));}
+   else if(a==='porte'){h+=arm('M'+L+' '+sh+' q-'+(H*.02)+' '+(H*.12)+' '+(H*.1)+' '+(H*.18))+arm('M'+R+' '+sh+' q'+(H*.02)+' '+(H*.12)+' -'+(H*.1)+' '+(H*.18));}
+   if(o.tenu)h+='<g transform="translate(0,'+(sh+H*.16)+')">'+o.tenu+'</g>';
+   // cou + tête
+   h+='<rect x="'+(-r*.35)+'" y="'+(bodyTop-r*.5)+'" width="'+(r*.7)+'" height="'+(r*.8)+'" fill="'+s[1]+'"/>';
+   h+='<g transform="translate(0,'+(bodyTop-r*1.05)+')'+(o.tilt?' rotate('+o.tilt+')':'')+'">'+face({r:r,skin:s,expr:o.expr,hair:o.hair,hairstyle:o.hairstyle,beard:o.beard,veil:o.veil,turban:o.turban,regard:o.regard,yeuxFermes:o.yeuxFermes})+'</g>';
+   h+='</g>';return h;
+ }
+ function shade(hex,amt){var n=parseInt(hex.slice(1),16),r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);}
+ /* ---------- décors ---------- */
+ var zel='<pattern id="zelP" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#2f6f78"/><path d="M7 0 L14 7 L7 14 L0 7Z" fill="#e8d9b8"/><circle cx="7" cy="7" r="2" fill="#b5452c"/></pattern>';
+ var bg={
+  salle:function(o){o=o||{};var g1=id('w'),g2=id('f');return '<defs>'+grad(g1,'#f1e3c9','#d9c4a0',1)+grad(g2,'#b89b72','#8d6f4b',1)+zel+'</defs><rect width="360" height="220" fill="url(#'+g1+')"/><rect x="0" y="150" width="360" height="70" fill="url(#'+g2+')"/><rect x="0" y="118" width="360" height="32" fill="url(#zelP)" opacity=".85"/>'+(o.fenetre!==false?fenetre(o.fx==null?215:o.fx,60,o.nuit):'')+(o.tapis!==false?'<ellipse cx="'+(o.tx||110)+'" cy="200" rx="95" ry="14" fill="#8a3b2a"/><ellipse cx="'+(o.tx||110)+'" cy="200" rx="80" ry="10" fill="#b5452c"/><ellipse cx="'+(o.tx||110)+'" cy="200" rx="40" ry="5" fill="#d9a441" opacity=".6"/>':'');},
+  patio:function(){var g=id('p');return '<defs>'+grad(g,'#dfeef1','#9fc3cc',1)+zel+'</defs><rect width="360" height="220" fill="#e8d4b0"/><rect x="0" y="0" width="360" height="130" fill="url(#'+g+')"/><g fill="#e8d4b0" stroke="#a8865a" stroke-width="2"><path d="M-10 130 V40 a40 40 0 0 1 80 0 V130Z"/><path d="M80 130 V40 a40 40 0 0 1 80 0 V130Z"/><path d="M200 130 V40 a40 40 0 0 1 80 0 V130Z"/><path d="M290 130 V40 a40 40 0 0 1 80 0 V130Z"/></g><g fill="#c9dde1" opacity=".8"><path d="M0 130 V46 a30 30 0 0 1 60 0 V130Z"/><path d="M90 130 V46 a30 30 0 0 1 60 0 V130Z"/><path d="M210 130 V46 a30 30 0 0 1 60 0 V130Z"/><path d="M300 130 V46 a30 30 0 0 1 60 0 V130Z"/></g><rect x="0" y="130" width="360" height="90" fill="url(#zelP)" opacity=".55"/><rect x="0" y="130" width="360" height="90" fill="#e8d4b0" opacity=".45"/><ellipse cx="180" cy="205" rx="40" ry="10" fill="#9fc3cc" stroke="#1f6f78"/><circle cx="180" cy="203" r="5" fill="#1f6f78"/>';},
+  rue:function(o){o=o||{};var g=id('s');return '<defs>'+grad(g,o.nuit?'#2a2a4a':'#f6d7a7',o.nuit?'#4a3b5c':'#fbf0dc',1)+'</defs><rect width="360" height="220" fill="url(#'+g+')"/><g fill="#e8d4b0" stroke="#a8865a"><rect x="0" y="40" width="90" height="140"/><rect x="100" y="20" width="70" height="160"/><rect x="250" y="30" width="60" height="150"/><rect x="315" y="55" width="45" height="125"/></g><rect x="170" y="70" width="80" height="110" fill="#c9b48e"/><g fill="#5a4330"><rect x="20" y="70" width="16" height="26"/><rect x="118" y="55" width="16" height="26"/><rect x="265" y="60" width="16" height="26"/><rect x="330" y="80" width="14" height="22"/></g><g fill="#9fc3cc"><rect x="50" y="110" width="22" height="18"/><rect x="140" y="100" width="20" height="18"/><rect x="285" y="100" width="18" height="16"/></g><rect x="0" y="180" width="360" height="40" fill="#b0a08a"/><rect x="0" y="180" width="360" height="4" fill="#8d7c66"/>';},
+  nuit:function(o){o=o||{};var g=id('n');return '<defs>'+rad(g,o.lum||'#f3b54a',.75,0)+'</defs><rect width="360" height="220" fill="'+(o.fond||'#2b2238')+'"/><ellipse cx="'+(o.cx||180)+'" cy="'+(o.cy||130)+'" rx="170" ry="120" fill="url(#'+g+')"/><rect x="0" y="180" width="360" height="40" fill="#1b1520" opacity=".6"/>';},
+  palais:function(o){o=o||{};var g=id('pl');return '<defs>'+grad(g,'#2a3140','#4a5569',1)+'</defs><rect width="360" height="220" fill="url(#'+g+')"/><rect x="0" y="170" width="360" height="50" fill="#1e2430"/><g fill="#c9c2b4"><rect x="30" y="20" width="18" height="150"/><rect x="312" y="20" width="18" height="150"/><rect x="20" y="14" width="38" height="10"/><rect x="302" y="14" width="38" height="10"/></g><g fill="#9a9385"><rect x="30" y="20" width="5" height="150"/><rect x="312" y="20" width="5" height="150"/></g><ellipse cx="180" cy="120" rx="150" ry="90" fill="#f3b54a" opacity=".07"/>';},
+  cachot:function(){var g=id('c');return '<defs>'+grad(g,'#2a2630','#4f4a58',1)+'</defs><rect width="360" height="220" fill="url(#'+g+')"/><rect x="0" y="175" width="360" height="45" fill="#3b3542"/><rect x="250" y="30" width="56" height="40" fill="#8fb8c6"/><g stroke="#1b181f" stroke-width="4"><line x1="268" y1="30" x2="268" y2="70"/><line x1="288" y1="30" x2="288" y2="70"/></g><path d="M250 70 L200 175 L356 175 L306 70Z" fill="#fff6dc" opacity=".08"/><g stroke="#5e5868" stroke-width="1" opacity=".6"><path d="M30 60 h40 M30 70 h28 M90 90 h50 M90 100 h30 M40 130 h44"/></g><rect x="20" y="150" width="90" height="25" fill="#6b6472"/><rect x="20" y="142" width="90" height="10" fill="#8a8494"/>';},
+  exterieur:function(o){o=o||{};var g=id('e');return '<defs>'+grad(g,o.ciel||'#8fc1d9',o.ciel2||'#e8f0f3',1)+'</defs><rect width="360" height="220" fill="url(#'+g+')"/>'+(o.soleil!==false?'<circle cx="300" cy="40" r="18" fill="#f3b54a"/><circle cx="300" cy="40" r="28" fill="#f3b54a" opacity=".25"/>':'')+'<path d="M0 150 Q90 120 180 140 T360 135 V220 H0Z" fill="'+(o.sol||'#7fb069')+'"/><path d="M0 170 Q120 150 240 165 T360 160 V220 H0Z" fill="'+(o.sol2||'#5e8f4f')+'"/>';},
+  hammam:function(){var g=id('h'),st=id('st');return '<defs>'+grad(g,'#5f7f86','#b7cfd4',1)+rad(st,'#fff',.55,0)+'</defs><rect width="360" height="220" fill="url(#'+g+')"/><path d="M0 90 Q180 -40 360 90 V0 H0Z" fill="#46636a"/><g fill="#fff3c4" opacity=".9"><circle cx="120" cy="34" r="4"/><circle cx="160" cy="22" r="4"/><circle cx="200" cy="22" r="4"/><circle cx="240" cy="34" r="4"/><circle cx="180" cy="42" r="3"/></g><g stroke="#fff3c4" stroke-width="14" opacity=".12"><line x1="160" y1="22" x2="120" y2="220"/><line x1="200" y1="22" x2="240" y2="220"/></g><g fill="#3e5a61"><path d="M-10 220 V120 a45 45 0 0 1 90 0 V220Z"/><path d="M280 220 V120 a45 45 0 0 1 90 0 V220Z"/></g><rect x="0" y="180" width="360" height="40" fill="#6f8f95"/><ellipse cx="90" cy="100" rx="70" ry="30" fill="url(#'+st+')"/><ellipse cx="270" cy="80" rx="80" ry="34" fill="url(#'+st+')"/>';}
+ };
+ function fenetre(x,y,nuit){var g=id('sk');return '<defs>'+grad(g,nuit?'#1b1f3a':'#7fb3c9',nuit?'#3a3b6a':'#dbe9ee',1)+'</defs><path d="M'+x+' 150 V'+y+' a45 45 0 0 1 90 0 V150Z" fill="#5a4330"/><path d="M'+(x+6)+' 150 V'+(y+2)+' a39 39 0 0 1 78 0 V150Z" fill="url(#'+g+')"/><g fill="#c9a97a" opacity=".9"><rect x="'+(x+11)+'" y="112" width="20" height="38"/><rect x="'+(x+35)+'" y="100" width="26" height="50"/><rect x="'+(x+65)+'" y="118" width="16" height="32"/></g><rect x="'+(x+41)+'" y="84" width="8" height="18" fill="#a8865a"/><g stroke="#3a2a1a" stroke-width="3"><line x1="'+(x+45)+'" y1="'+(y+2)+'" x2="'+(x+45)+'" y2="150"/><line x1="'+(x+6)+'" y1="105" x2="'+(x+84)+'" y2="105"/></g>'+(nuit?'<circle cx="'+(x+30)+'" cy="'+(y+20)+'" r="7" fill="#f3e6c9"/>':'');}
+ /* ---------- accessoires ---------- */
+ var props={
+  boite:function(x,y,ouverte){return '<g transform="translate('+x+','+y+')"><path d="M0 12 L34 12 L34 34 L0 34Z" fill="#8a5a2e"/><path d="M0 12 L8 4 L42 4 L34 12Z" fill="#a97444"/><path d="M34 12 L42 4 L42 26 L34 34Z" fill="#6b4320"/>'+(ouverte?'<path d="M0 12 L-3 -6 L31 -6 L34 12Z" fill="#a97444" stroke="#6b4320"/><g fill="#fff8d6"><polygon points="17,-2 19,3 24,3 20,6 21,11 17,8 13,11 14,6 10,3 15,3"/></g><circle cx="8" cy="18" r="3" fill="#5aa9d6"/><circle cx="24" cy="20" r="2.5" fill="#b5452c"/>':'<rect x="14" y="18" width="6" height="6" fill="#d9a441"/>')+'</g>';},
+  chat:function(x,y,c){c=c||'#4a4a4a';return '<g transform="translate('+x+','+y+')"><ellipse cx="30" cy="30" rx="30" ry="12" fill="'+c+'"/><circle cx="52" cy="22" r="10" fill="'+c+'"/><path d="M45 14 l2 -9 l6 6Z M53 13 l5 -8 l2 9Z" fill="'+c+'"/><path d="M48 23 q2 2 4 0 M54 23 q2 2 4 0" stroke="#111" stroke-width="1.2" fill="none"/><path d="M2 32 q-10 -12 4 -18" stroke="'+c+'" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="44" cy="26" rx="2" ry="1" fill="#e8a088"/></g>';},
+  chatAssis:function(x,y,c){c=c||'#c9a97a';return '<g transform="translate('+x+','+y+')"><ellipse cx="0" cy="0" rx="12" ry="16" fill="'+c+'"/><circle cx="0" cy="-20" r="9" fill="'+c+'"/><path d="M-8 -26 l-1 -9 l7 5Z M8 -26 l1 -9 l-7 5Z" fill="'+c+'"/><circle cx="-3" cy="-21" r="1.5" fill="#2b2118"/><circle cx="3" cy="-21" r="1.5" fill="#2b2118"/><path d="M12 8 q14 -6 8 -20" stroke="'+c+'" stroke-width="4" fill="none" stroke-linecap="round"/></g>';},
+  lampe:function(x,y){var g=id('lp');return '<g transform="translate('+x+','+y+')"><defs>'+rad(g,'#ffd27a',.7,0)+'</defs><circle cx="20" cy="30" r="80" fill="url(#'+g+')"/><rect x="8" y="50" width="24" height="40" fill="#8a6d3b"/><rect x="0" y="86" width="40" height="8" fill="#5c4529"/><path d="M4 50 h32 l-6 -30 h-20Z" fill="#cfe7ee" opacity=".8"/><ellipse cx="20" cy="38" rx="5" ry="10" fill="#ffb347"/><ellipse cx="20" cy="40" rx="2.5" ry="6" fill="#fff6d0"/></g>';},
+  bougie:function(x,y){var g=id('bg');return '<g transform="translate('+x+','+y+')"><defs>'+rad(g,'#f3b54a',.5,0)+'</defs><circle cx="0" cy="-10" r="40" fill="url(#'+g+')"/><rect x="-4" y="0" width="8" height="26" fill="#fff5d6"/><ellipse cx="0" cy="-5" rx="4" ry="8" fill="#ffb347"/><ellipse cx="0" cy="-3" rx="2" ry="4" fill="#fff6d0"/></g>';},
+  table:function(x,y,w){w=w||90;return '<g transform="translate('+x+','+y+')"><rect x="0" y="0" width="'+w+'" height="8" fill="#8a5a2e"/><rect x="6" y="8" width="8" height="40" fill="#6b4320"/><rect x="'+(w-14)+'" y="8" width="8" height="40" fill="#6b4320"/></g>';},
+  plateau:function(x,y){return '<g transform="translate('+x+','+y+')"><ellipse cx="0" cy="0" rx="40" ry="12" fill="#d9a441"/><ellipse cx="0" cy="-2" rx="34" ry="9" fill="#e8c46a"/><g fill="#9fc3cc"><rect x="-26" y="-14" width="7" height="12" rx="2"/><rect x="-6" y="-14" width="7" height="12" rx="2"/><rect x="14" y="-14" width="7" height="12" rx="2"/></g><path d="M-2 -28 h14 q6 0 6 6 v6 h-20Z" fill="#c9cfd6"/><path d="M-6 -16 q-6 -14 4 -22" stroke="#ccc" fill="none" stroke-width="1.5"/></g>';},
+  pelle:function(x,y){return '<g transform="translate('+x+','+y+')"><rect x="0" y="0" width="4" height="50" fill="#8a6d3b"/><path d="M-6 50 h16 l-3 14 h-10Z" fill="#555"/></g>';},
+  livre:function(x,y,c){return '<g transform="translate('+x+','+y+')"><rect x="0" y="0" width="26" height="18" fill="'+(c||'#fff8e8')+'" stroke="#8a6d3b"/><line x1="13" y1="0" x2="13" y2="18" stroke="#8a6d3b"/><g stroke="#b5452c" stroke-width="1"><line x1="3" y1="5" x2="11" y2="5"/><line x1="3" y1="9" x2="11" y2="9"/><line x1="15" y1="5" x2="23" y2="5"/><line x1="15" y1="9" x2="23" y2="9"/></g></g>';},
+  lettre:function(x,y){return '<g transform="translate('+x+','+y+')"><rect x="0" y="0" width="28" height="20" fill="#fff8e8" stroke="#8a6d3b" transform="rotate(-6)"/><g stroke="#8a6d3b" stroke-width="1" transform="rotate(-6)"><line x1="4" y1="6" x2="24" y2="6"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="4" y1="14" x2="24" y2="14"/></g></g>';},
+  tambour:function(x,y){return '<g transform="translate('+x+','+y+')"><ellipse cx="0" cy="0" rx="22" ry="9" fill="#e8d4b0" stroke="#8a6d3b"/><rect x="-22" y="0" width="44" height="22" fill="#b5452c"/><ellipse cx="0" cy="22" rx="22" ry="9" fill="#8a4b2a"/><g stroke="#d9a441" stroke-width="1.5"><line x1="-18" y1="0" x2="-14" y2="22"/><line x1="18" y1="0" x2="14" y2="22"/><line x1="0" y1="0" x2="0" y2="22"/></g></g>';},
+  bracelets:function(x,y){return '<g transform="translate('+x+','+y+')" fill="none" stroke="#d9a441" stroke-width="3"><circle cx="0" cy="0" r="9"/><circle cx="16" cy="4" r="9"/><circle cx="0" cy="0" r="12" stroke="#f3e6c9" stroke-width="1" opacity=".7"/></g>';},
+  fumee:function(x,y,c){return '<path d="M'+x+' '+y+' q-8 -14 0 -26 q8 -12 0 -24 q-6 -10 2 -20" stroke="'+(c||'#ddd')+'" fill="none" stroke-width="2" opacity=".6"/>';},
+  vapeur:function(x,y,rx,ry){var g=id('v');return '<defs>'+rad(g,'#fff',.55,0)+'</defs><ellipse cx="'+x+'" cy="'+y+'" rx="'+rx+'" ry="'+ry+'" fill="url(#'+g+')"/>';},
+  guillotine:function(x,y,s){s=s||1;return '<g transform="translate('+x+','+y+') scale('+s+')"><g fill="#5c4529"><rect x="0" y="0" width="7" height="110"/><rect x="48" y="0" width="7" height="110"/><rect x="-4" y="-6" width="63" height="7"/><rect x="-25" y="102" width="105" height="9"/></g><path d="M7 28 h41 l0 12 l-41 -7Z" fill="#c9cfd6"/><circle cx="27" cy="84" r="11" fill="none" stroke="#8a8494" stroke-width="3"/></g>';},
+  foule:function(x,y,n,c){var h='<g transform="translate('+x+','+y+')">';for(var i=0;i<n;i++){var ox=i*16+(i%2)*4,oy=(i%3)*3;h+='<ellipse cx="'+ox+'" cy="'+(26+oy)+'" rx="9" ry="12" fill="'+(c||'#6e5a4a')+'"/><circle cx="'+ox+'" cy="'+(10+oy)+'" r="6.5" fill="#d9a97e"/><path d="M'+(ox-6)+' '+(8+oy)+' q6 -8 12 0Z" fill="#2b1d12"/>';}return h+'</g>';},
+  barreaux:function(x,y,w,h,n){var s='<g stroke="#8a8494" stroke-width="4">';for(var i=0;i<=n;i++)s+='<line x1="'+(x+i*w/n)+'" y1="'+y+'" x2="'+(x+i*w/n)+'" y2="'+(y+h)+'"/>';return s+'</g>';},
+  etoiles:function(){return '<g fill="#fff" opacity=".9"><circle cx="40" cy="30" r="1.5"/><circle cx="110" cy="20" r="1.2"/><circle cx="250" cy="25" r="1.6"/><circle cx="300" cy="45" r="1.2"/><circle cx="330" cy="20" r="1.5"/><circle cx="180" cy="15" r="1"/></g>';},
+  bulle:function(x,y,txt,c){var w=txt.length*5.6+16;return '<g transform="translate('+x+','+y+')"><rect x="'+(-w/2)+'" y="-12" width="'+w+'" height="22" rx="11" fill="'+(c||'#fff8e8')+'" stroke="#8a6d3b"/><path d="M-4 10 l4 8 l4 -8Z" fill="'+(c||'#fff8e8')+'"/><text x="0" y="3" text-anchor="middle" font-size="9" font-weight="700" fill="#2b2118">'+txt+'</text></g>';},
+  legende:function(txt,clair){return '<text x="180" y="212" text-anchor="middle" font-size="10" font-style="italic" fill="'+(clair?'#f3e6c9':'#5a4a3a')+'">'+txt+'</text>';},
+  titre:function(txt,clair){return '<text x="180" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="'+(clair?'#f3e6c9':'#2b2118')+'" opacity=".9">'+txt+'</text>';},
+  nom:function(x,y,txt,c){return '<text x="'+x+'" y="'+y+'" text-anchor="middle" font-size="9" font-weight="700" fill="'+(c||'#2b2118')+'">'+txt+'</text>';}
+ };
+ function scene(parts){return '<svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg">'+parts.join('')+'</svg>';}
+ function set(oid,ch,ep,svg,cap){var c=BAM.oeuvres[oid].chapitres[ch];if(!c||!c.episodes[ep])return;c.episodes[ep].svg=svg;if(cap)c.episodes[ep].cap=cap;}
+ return {person:person,face:face,bg:bg,p:props,scene:scene,set:set,SK:SK,fenetre:fenetre};
+})();
+
 /* === antigone/00-oeuvre.js === */
 reg({
  id:'antigone',
@@ -282,6 +426,24 @@ addChap('antigone',{
  ]
 });
 
+/* === antigone/01-seq01.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('antigone',0,0,S([B.palais(),
+ P({x:40,y:205,h:120,expr:'serein',hairstyle:'court',hair:'#555',dress:'#4a3b5c',arms:'pointe',skin:'clair'}),
+ P({x:120,y:208,h:105,expr:'triste',hairstyle:'court',hair:'#1a1210',dress:'#b5452c',dress2:'#7a2e20',arms:'bas',skin:'clair'}),
+ P({x:170,y:208,h:108,expr:'joie',hairstyle:'long',hair:'#e8c46a',dress:'#d9a441',arms:'hanches',skin:'clair'}),
+ P({x:222,y:206,h:118,expr:'serein',hairstyle:'court',dress:'#1f6f78',arms:'bas',skin:'clair'}),
+ P({x:272,y:204,h:128,expr:'severe',hairstyle:'blanc',dress:'#2b2118',dress2:'#000',arms:'croise',skin:'clair'}),
+ P({x:325,y:208,h:110,expr:'neutre',hairstyle:'voile',veil:'#9c4f7a',hair:'#ddd',dress:'#6e3a55',arms:'porte',skin:'clair',tenu:'<g stroke="#f3e6c9" stroke-width="2" fill="none"><path d="M-12 0 q12 -10 24 0 q-12 10 -24 0Z"/></g>'}),
+ p.titre('« Voilà. Ces personnages vont vous jouer… »',true),
+ p.nom(120,218,'Antigone','#f3e6c9'),p.nom(170,218,'Ismène','#f3e6c9'),p.nom(222,218,'Hémon','#f3e6c9'),p.nom(272,218,'Créon','#f3e6c9'),p.nom(325,218,'Eurydice','#f3e6c9')]),
+ "Tous sont là, en habits de soirée ; le Prologue les désigne un à un au public");
+I.set('antigone',0,3,S([B.palais(),'<path d="M20 110 H340" stroke="#c9c2b4" stroke-width="2"/>',
+ '<g font-size="9" text-anchor="middle" fill="#f3e6c9"><circle cx="40" cy="110" r="7" fill="#1f6f78"/><text x="40" y="134">Aube</text><text x="40" y="146">Antigone rentre</text><circle cx="130" cy="110" r="7" fill="#d9a441"/><text x="130" y="134">Arrestation</text><circle cx="220" cy="110" r="7" fill="#b5452c"/><text x="220" y="134">Face à Créon</text><circle cx="310" cy="110" r="7" fill="#8a8494"/><text x="310" y="134">Mort</text><text x="310" y="146">Antigone, Hémon,</text><text x="310" y="158">Eurydice</text></g>',
+ p.titre('Le spectateur sait tout dès la première minute',true)]),
+ "Le Prologue dévoile la fin : il n'y aura pas de suspense, seulement l'attente");
+})();
+
 addLocked("antigone",{"titre":"Antigone et la Nourrice","sous":"Le retour à l'aube · le monde gris et beau · le mensonge de l'amoureux · tendresse et gronderie"});
 addLocked("antigone",{"titre":"Antigone et Ismène","sous":"Deux sœurs, deux visions · « j'ai bien réfléchi » · la peur de la foule · « je ne veux pas comprendre »"});
 addLocked("antigone",{"titre":"La chienne Douce et les adieux à Hémon","sous":"Antigone confie Douce à la Nourrice · la scène d'amour · l'enfant qu'ils n'auront pas · « sors sans rien dire »"});
@@ -395,110 +557,6 @@ reg({
  +'</div>'
 });
 
-/* === bam/01-ch01-svg.js === */
-/* Illustrations enrichies (v2) pour La Boîte à merveilles, chapitre 1 — remplacent les SVG simples */
-(function(){
-var c=BAM.oeuvres.bam.chapitres[0];if(!c)return;
-/* 1. L'enfant solitaire à la fenêtre */
-c.episodes[0].svg='<svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg">'
-+'<defs><linearGradient id="w1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1e3c9"/><stop offset="1" stop-color="#d9c4a0"/></linearGradient>'
-+'<linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fb3c9"/><stop offset="1" stop-color="#dbe9ee"/></linearGradient>'
-+'<radialGradient id="light1" cx=".7" cy=".35" r=".6"><stop offset="0" stop-color="#fff6dc" stop-opacity=".9"/><stop offset="1" stop-color="#fff6dc" stop-opacity="0"/></radialGradient>'
-+'<linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0c9a2"/><stop offset="1" stop-color="#d9a97e"/></linearGradient>'
-+'<linearGradient id="floor1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b89b72"/><stop offset="1" stop-color="#8d6f4b"/></linearGradient>'
-+'<pattern id="zel" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#2f6f78"/><path d="M7 0 L14 7 L7 14 L0 7Z" fill="#e8d9b8"/><circle cx="7" cy="7" r="2" fill="#b5452c"/></pattern></defs>'
-+'<rect width="360" height="220" fill="url(#w1)"/>'
-+'<rect x="0" y="150" width="360" height="70" fill="url(#floor1)"/>'
-+'<rect x="0" y="150" width="360" height="3" fill="#6b4f30" opacity=".5"/>'
-+'<rect x="0" y="118" width="360" height="32" fill="url(#zel)" opacity=".85"/>'
-/* fenêtre en arc */
-+'<path d="M215 150 V60 a45 45 0 0 1 90 0 V150Z" fill="#5a4330"/>'
-+'<path d="M221 150 V62 a39 39 0 0 1 78 0 V150Z" fill="url(#sky1)"/>'
-+'<g fill="#c9a97a" opacity=".9"><rect x="226" y="112" width="20" height="38"/><rect x="250" y="100" width="26" height="50"/><rect x="280" y="118" width="16" height="32"/></g>'
-+'<g fill="#7a5a3a" opacity=".8"><rect x="232" y="120" width="6" height="9"/><rect x="258" y="110" width="7" height="10"/></g>'
-+'<rect x="256" y="84" width="8" height="18" fill="#a8865a"/><path d="M254 84 h12 l-6 -6Z" fill="#a8865a"/>'
-+'<g stroke="#3a2a1a" stroke-width="3"><line x1="260" y1="62" x2="260" y2="150"/><line x1="221" y1="105" x2="299" y2="105"/></g>'
-+'<rect x="150" y="40" width="210" height="180" fill="url(#light1)"/>'
-/* tapis */
-+'<ellipse cx="110" cy="200" rx="95" ry="14" fill="#8a3b2a"/><ellipse cx="110" cy="200" rx="80" ry="10" fill="#b5452c"/><ellipse cx="110" cy="200" rx="40" ry="5" fill="#d9a441" opacity=".6"/>'
-/* enfant assis, tête penchée, menton dans la main */
-+'<g transform="translate(70,70)">'
-+'<ellipse cx="42" cy="124" rx="44" ry="8" fill="#000" opacity=".15"/>'
-+'<path d="M4 122 Q2 70 40 68 Q78 70 80 122Z" fill="#f4f0e6"/><path d="M4 122 Q2 70 40 68 Q50 70 52 122Z" fill="#fff" opacity=".6"/>'
-+'<path d="M26 72 Q40 60 54 72 L52 120 L28 120Z" fill="#e9e3d6"/>'
-/* bras gauche posé, bras droit soutient le menton */
-+'<path d="M10 100 q-8 14 10 18 l20 0" stroke="url(#skin)" stroke-width="11" fill="none" stroke-linecap="round"/>'
-+'<path d="M74 96 q6 -22 -6 -40" stroke="url(#skin)" stroke-width="11" fill="none" stroke-linecap="round"/>'
-+'<ellipse cx="66" cy="52" rx="8" ry="6" fill="#e8bd94"/>'
-/* tête */
-+'<ellipse cx="44" cy="40" rx="23" ry="26" fill="url(#skin)"/>'
-+'<path d="M21 36 Q24 8 46 10 Q70 10 68 38 Q62 22 46 20 Q30 22 21 36Z" fill="#2b1d12"/>'
-+'<path d="M24 24 q10 -10 22 -8" stroke="#3d2a1a" stroke-width="2" fill="none"/>'
-+'<ellipse cx="22" cy="42" rx="4" ry="6" fill="#d9a97e"/>'
-/* yeux tristes : paupières tombantes vers l extérieur */
-+'<path d="M30 38 q6 -4 12 0" stroke="#2b1d12" stroke-width="2" fill="none"/><path d="M50 38 q6 -4 12 0" stroke="#2b1d12" stroke-width="2" fill="none"/>'
-+'<ellipse cx="36" cy="42" rx="3.2" ry="3.6" fill="#fff"/><ellipse cx="56" cy="42" rx="3.2" ry="3.6" fill="#fff"/>'
-+'<circle cx="37" cy="43" r="2.2" fill="#2b1d12"/><circle cx="57" cy="43" r="2.2" fill="#2b1d12"/><circle cx="37.8" cy="42.2" r=".7" fill="#fff"/><circle cx="57.8" cy="42.2" r=".7" fill="#fff"/>'
-+'<path d="M32 36 l8 -3" stroke="#2b1d12" stroke-width="1.6"/><path d="M60 36 l-8 -3" stroke="#2b1d12" stroke-width="1.6"/>'
-+'<path d="M45 50 q1 4 -2 6" stroke="#b5825a" stroke-width="1.3" fill="none"/>'
-+'<path d="M40 58 q5 -2 10 0" stroke="#8a4b3a" stroke-width="1.6" fill="none"/>'
-+'<ellipse cx="30" cy="50" rx="4" ry="2" fill="#e8a088" opacity=".45"/><ellipse cx="60" cy="50" rx="4" ry="2" fill="#e8a088" opacity=".45"/>'
-+'</g>'
-/* chat endormi */
-+'<g transform="translate(14,150)"><ellipse cx="30" cy="30" rx="30" ry="12" fill="#4a4a4a"/><ellipse cx="30" cy="30" rx="22" ry="9" fill="#5e5e5e"/><circle cx="52" cy="22" r="10" fill="#4a4a4a"/><path d="M45 14 l2 -9 l6 6Z M53 13 l5 -8 l2 9Z" fill="#4a4a4a"/><path d="M48 23 q2 2 4 0 M54 23 q2 2 4 0" stroke="#111" stroke-width="1.2" fill="none"/><path d="M2 32 q-10 -12 4 -18" stroke="#4a4a4a" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="44" cy="26" rx="2" ry="1" fill="#e8a088"/></g>'
-/* la boîte fermée, posée près de lui */
-+'<g transform="translate(170,165)"><path d="M0 12 L34 12 L34 34 L0 34Z" fill="#8a5a2e"/><path d="M0 12 L8 4 L42 4 L34 12Z" fill="#a97444"/><path d="M34 12 L42 4 L42 26 L34 34Z" fill="#6b4320"/><rect x="14" y="18" width="6" height="6" fill="#d9a441"/></g>'
-+'<text x="180" y="212" text-anchor="middle" font-size="10" fill="#f3e6c9" font-style="italic">« Je n\'avais pas d\'ami. »</text>'
-+'</svg>';
-c.episodes[0].cap="Sidi Mohammed, six ans : la lumière de la fenêtre, le regard ailleurs, la boîte à portée de main";
-
-/* 3. Le bain maure */
-c.episodes[2].svg='<svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg">'
-+'<defs><linearGradient id="hw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f7f86"/><stop offset=".6" stop-color="#8aa7ad"/><stop offset="1" stop-color="#b7cfd4"/></linearGradient>'
-+'<radialGradient id="steam" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
-+'<radialGradient id="lamp" cx=".5" cy="0" r=".9"><stop offset="0" stop-color="#ffd27a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>'
-+'<linearGradient id="wet" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9d0b4"/><stop offset="1" stop-color="#b98c6a"/></linearGradient>'
-+'<linearGradient id="skin2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0c9a2"/><stop offset="1" stop-color="#d9a97e"/></linearGradient></defs>'
-+'<rect width="360" height="220" fill="url(#hw)"/>'
-/* coupole percée d étoiles de lumière */
-+'<path d="M0 90 Q180 -40 360 90 V0 H0Z" fill="#46636a"/>'
-+'<g fill="#fff3c4" opacity=".9"><circle cx="120" cy="34" r="4"/><circle cx="160" cy="22" r="4"/><circle cx="200" cy="22" r="4"/><circle cx="240" cy="34" r="4"/><circle cx="180" cy="42" r="3"/></g>'
-+'<g stroke="#fff3c4" stroke-width="14" opacity=".12"><line x1="160" y1="22" x2="120" y2="220"/><line x1="200" y1="22" x2="240" y2="220"/><line x1="180" y1="42" x2="180" y2="220"/></g>'
-/* arcades */
-+'<g fill="#3e5a61"><path d="M-10 220 V120 a45 45 0 0 1 90 0 V220Z"/><path d="M280 220 V120 a45 45 0 0 1 90 0 V220Z"/></g>'
-+'<g fill="#2f474d"><path d="M0 220 V124 a35 35 0 0 1 70 0 V220Z"/><path d="M290 220 V124 a35 35 0 0 1 70 0 V220Z"/></g>'
-/* sol mouillé et reflets */
-+'<rect x="0" y="180" width="360" height="40" fill="#6f8f95"/><rect x="0" y="180" width="360" height="40" fill="url(#lamp)" opacity=".5"/>'
-/* silhouettes de femmes, dos et profils, dans la vapeur */
-+'<g fill="#7d5a45" opacity=".85"><ellipse cx="110" cy="175" rx="28" ry="36"/><circle cx="110" cy="128" r="16"/><path d="M96 120 q14 -16 28 0 q-4 -10 -14 -10 q-10 0 -14 10Z" fill="#2b1d12"/></g>'
-+'<g fill="#8a6a55" opacity=".8"><ellipse cx="250" cy="172" rx="30" ry="40"/><circle cx="250" cy="122" r="17"/><path d="M233 118 q17 -18 34 0 q-5 -11 -17 -11 q-12 0 -17 11Z" fill="#2b1d12"/><path d="M276 150 l22 -28" stroke="#8a6a55" stroke-width="12" stroke-linecap="round"/></g>'
-+'<g fill="#6e4f3c" opacity=".55"><ellipse cx="40" cy="190" rx="22" ry="26"/><circle cx="40" cy="155" r="13"/><ellipse cx="320" cy="192" rx="22" ry="26"/><circle cx="322" cy="157" r="13"/></g>'
-/* seaux renversés, eau */
-+'<g><ellipse cx="70" cy="206" rx="16" ry="6" fill="#4a3a2a"/><path d="M56 206 l4 -22 h20 l4 22Z" fill="#8a6d3b"/><ellipse cx="70" cy="184" rx="14" ry="5" fill="#a8865a"/><path d="M88 200 q20 -6 40 6" stroke="#cfe6ea" stroke-width="3" fill="none" opacity=".7"/></g>'
-+'<g><ellipse cx="300" cy="208" rx="16" ry="6" fill="#4a3a2a"/><path d="M286 208 l4 -22 h20 l4 22Z" fill="#8a6d3b"/><ellipse cx="300" cy="186" rx="14" ry="5" fill="#a8865a"/></g>'
-/* l enfant au centre, recroquevillé, effrayé */
-+'<g transform="translate(150,120)">'
-+'<ellipse cx="30" cy="92" rx="34" ry="7" fill="#000" opacity=".2"/>'
-+'<path d="M8 90 Q6 52 30 50 Q54 52 52 90Z" fill="url(#skin2)"/>'
-+'<path d="M2 78 q6 -18 18 -14" stroke="url(#skin2)" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M58 78 q-6 -18 -18 -14" stroke="url(#skin2)" stroke-width="9" fill="none" stroke-linecap="round"/>'
-+'<ellipse cx="30" cy="34" rx="19" ry="21" fill="url(#skin2)"/>'
-+'<path d="M12 30 Q14 8 30 8 Q46 8 48 30 Q42 18 30 17 Q18 18 12 30Z" fill="#2b1d12"/>'
-/* grands yeux écarquillés, sourcils levés, bouche ouverte */
-+'<path d="M18 26 q6 -5 11 -1" stroke="#2b1d12" stroke-width="2" fill="none"/><path d="M42 26 q-6 -5 -11 -1" stroke="#2b1d12" stroke-width="2" fill="none"/>'
-+'<ellipse cx="23" cy="34" rx="4.5" ry="5.5" fill="#fff"/><ellipse cx="37" cy="34" rx="4.5" ry="5.5" fill="#fff"/>'
-+'<circle cx="23" cy="35" r="2.6" fill="#2b1d12"/><circle cx="37" cy="35" r="2.6" fill="#2b1d12"/><circle cx="24" cy="34" r=".8" fill="#fff"/><circle cx="38" cy="34" r=".8" fill="#fff"/>'
-+'<ellipse cx="30" cy="47" rx="3.5" ry="4.5" fill="#6b2a22"/><ellipse cx="30" cy="46" rx="2.2" ry="2" fill="#fff" opacity=".8"/>'
-+'<ellipse cx="16" cy="40" rx="3.5" ry="2" fill="#e8a088" opacity=".5"/><ellipse cx="44" cy="40" rx="3.5" ry="2" fill="#e8a088" opacity=".5"/>'
-+'<path d="M10 46 q-4 4 -2 10 M50 46 q4 4 2 10" stroke="#9fc3cc" stroke-width="1.5" fill="none"/>'
-+'</g>'
-/* nappes de vapeur */
-+'<ellipse cx="90" cy="100" rx="70" ry="30" fill="url(#steam)"/><ellipse cx="270" cy="80" rx="80" ry="34" fill="url(#steam)"/><ellipse cx="180" cy="200" rx="120" ry="26" fill="url(#steam)"/>'
-+'<ellipse cx="180" cy="60" rx="140" ry="40" fill="url(#steam)" opacity=".6"/>'
-+'<text x="180" y="18" text-anchor="middle" font-size="11" fill="#f3e6c9" font-weight="700" opacity=".9">Vapeur, cris, corps inconnus</text>'
-+'</svg>';
-c.episodes[2].cap="Le hammam : sous la coupole percée d'étoiles, l'enfant perdu au milieu de silhouettes qui crient";
-})();
-
 /* === bam/01-ch01.js === */
 addChap('bam',{
  titre:"Entrée dans l'œuvre",
@@ -549,6 +607,52 @@ addChap('bam',{
   {t:"Réaction personnelle",s:"L'enfant est effrayé par la cérémonie des Gnaouas mais ne peut s'empêcher de la regarder. Avez-vous déjà ressenti cette attirance pour ce qui fait peur ? Justifiez en 3 lignes.",open:true,m:"Réponse attendue : une prise de position claire, un exemple personnel concret (fête, spectacle, lieu…) et l'explication du sentiment mêlé (curiosité + peur). Ex. : lors d'une fête de l'Achoura, les tambours et les masques m'effrayaient mais je restais au premier rang : la peur rend le spectacle plus intense."}
  ]
 });
+
+/* === bam/01-ch01.svg.js === */
+/* Illustrations enrichies — BAM chapitre 1 */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+/* 1. L'enfant solitaire à la fenêtre */
+I.set('bam',0,0,S([B.salle({fx:215}),p.chat(14,150),
+ P({x:95,y:198,h:110,pose:'assis',expr:'triste',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'visage',regard:3,tilt:-6}),
+ p.boite(175,165,false),p.legende("Je n'avais pas d'ami.",true)]),
+ "Sidi Mohammed, six ans : la lumière de la fenêtre, le regard ailleurs, la boîte à portée de main");
+/* 3. Le bain maure */
+I.set('bam',0,2,S([B.hammam(),
+ P({x:110,y:205,h:120,expr:'colere',hairstyle:'long',hair:'#2b1d12',dress:'#7d5a45',arms:'leve',skin:'mat'}),
+ P({x:255,y:205,h:125,expr:'colere',hairstyle:'long',dress:'#8a6a55',arms:'pointe',flip:true,skin:'moyen'}),
+ P({x:40,y:210,h:95,expr:'neutre',hairstyle:'long',dress:'#6e4f3c',skin:'fonce'}),P({x:325,y:210,h:95,expr:'joie',hairstyle:'long',dress:'#6e4f3c'}),
+ '<g><ellipse cx="70" cy="206" rx="16" ry="6" fill="#4a3a2a"/><path d="M56 206 l4 -22 h20 l4 22Z" fill="#8a6d3b"/><ellipse cx="70" cy="184" rx="14" ry="5" fill="#a8865a"/></g>',
+ P({x:180,y:208,h:72,pose:'accroupi',expr:'peur',dress:'#f0c9a2',dress2:'#d9a97e',arms:'visage'}),
+ p.vapeur(180,200,120,26),p.vapeur(180,60,140,40),p.titre('Vapeur, cris, corps inconnus',true)]),
+ "Le hammam : sous la coupole percée d'étoiles, l'enfant perdu au milieu de silhouettes qui crient");
+/* 4. Les Gnaouas */
+I.set('bam',0,3,S([B.nuit({fond:'#2a1f3a',lum:'#f3b54a',cy:150}),
+ p.bougie(180,150),
+ P({x:70,y:205,h:120,expr:'serein',yeuxFermes:true,hairstyle:'turban',turban:'#2b2118',dress:'#111',dress2:'#000',skin:'fonce',arms:'leve',tenu:'<g fill="#d9a441"><ellipse cx="-22" cy="-30" rx="8" ry="4"/><ellipse cx="22" cy="-30" rx="8" ry="4"/></g>'}),
+ P({x:290,y:205,h:120,expr:'joie',hairstyle:'turban',turban:'#2b2118',dress:'#111',dress2:'#000',skin:'fonce',arms:'porte',tenu:'<g><rect x="-3" y="-30" width="6" height="60" fill="#8a4b2a"/><ellipse cx="0" cy="34" rx="12" ry="8" fill="#c48a5a"/></g>'}),
+ '<g fill="#b5452c" opacity=".92" transform="translate(180,120)"><path d="M-14 80 q14 -60 30 -10 q10 25 -16 20Z"/><circle cx="12" cy="4" r="12"/><path d="M-30 60 q-20 -30 10 -40" stroke="#b5452c" stroke-width="9" fill="none" stroke-linecap="round"/></g><path d="M166 200 q14 -60 30 -10 q10 25 -16 20Z" fill="#b5452c" opacity=".35"/>',
+ P({x:330,y:212,h:60,expr:'peur',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'croise'}),
+ p.fumee(230,190,'#ddd'),p.fumee(120,195,'#ddd'),p.titre('Crotales, guembri, encens, transe',true)]),
+ "Les Gnaouas : la transe à la lueur d'une bougie ; l'enfant regarde, fasciné et effrayé");
+/* 5. La dispute */
+I.set('bam',0,4,S([B.patio(),
+ '<line x1="40" y1="40" x2="320" y2="48" stroke="#8a6d3b" stroke-width="2"/><g fill="#fff" stroke="#c9b48e"><rect x="70" y="42" width="30" height="40"/><rect x="130" y="44" width="26" height="36"/><rect x="230" y="46" width="34" height="42"/></g>',
+ P({x:100,y:208,h:125,expr:'colere',hairstyle:'voile',veil:'#1f6f78',dress:'#2f6f78',arms:'pointe'}),
+ P({x:262,y:208,h:125,expr:'colere',hairstyle:'voile',veil:'#b5452c',dress:'#a8402a',arms:'pointe',flip:true,skin:'mat'}),
+ P({x:180,y:214,h:58,expr:'pleur',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'visage'}),
+ p.bulle(100,60,'Ma terrasse !','#e4f1f2'),p.bulle(262,60,'Ma lessive !','#fae4df'),
+ p.nom(100,218,'Lalla Zoubida','#1f6f78'),p.nom(262,218,'Rahma','#b5452c')]),
+ "Jour de lessive : les deux voisines s'affrontent sur la terrasse, l'enfant pleure entre elles");
+/* 6. La boîte à merveilles */
+I.set('bam',0,5,S([B.salle({fenetre:false,tapis:false}),
+ '<rect x="0" y="0" width="360" height="150" fill="#2b1d12" opacity=".55"/>',p.bougie(300,150),
+ P({x:120,y:200,h:100,pose:'assis',expr:'joie',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'tend',regard:2}),
+ '<g transform="translate(150,150) scale(1.4)">'+p.boite(0,0,true)+'</g>',
+ '<g><circle cx="60" cy="90" r="7" fill="#5aa9d6" stroke="#2b2118"/><circle cx="57" cy="87" r="2.5" fill="#fff" opacity=".8"/><circle cx="250" cy="80" r="6" fill="#b5452c" stroke="#2b2118"/><circle cx="250" cy="80" r="2" fill="#2b2118"/><path d="M90 60 l8 0 l-4 10Z" fill="#d9a441"/><rect x="220" y="110" width="14" height="5" rx="2" fill="#8a6d3b"/><circle cx="234" cy="112" r="3" fill="#2b2118"/></g>',
+ '<g stroke="#f3e6c9" stroke-width="2" opacity=".8"><line x1="100" y1="40" x2="106" y2="34"/><line x1="280" y1="50" x2="286" y2="56"/><line x1="40" y1="130" x2="46" y2="124"/><line x1="200" y1="40" x2="200" y2="48"/></g>',
+ p.legende('Boules de verre · boutons · clous · bijoux de pacotille',true)]),
+ "Des objets sans valeur qui deviennent des merveilles : le seul moment où l'enfant sourit");
+})();
 
 addLocked("bam",{"titre":"Le Msid et Sidi Boughaleb","sous":"L'école coranique · le fqih · Lalla Aïcha · le sanctuaire · le chat · la maladie"});
 addLocked("bam",{"titre":"La lampe à pétrole et Zineb perdue","sous":"Jalousie de la mère · la lampe · disparition de Zineb · repas des mendiants"});
@@ -688,6 +792,14 @@ addChap('ddc',{
  ]
 });
 
+/* === ddc/01-et01.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('ddc',0,0,S([B.cachot(),'<path d="M40 20 Q180 200 320 20" stroke="#b5452c" stroke-width="44" fill="none" opacity=".18"/>',
+ P({x:150,y:205,h:125,pose:'assis',expr:'triste',hairstyle:'court',hair:'#2b1d12',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'croise',skin:'clair',tilt:-8}),
+ p.legende('Toujours seul avec elle, toujours glacé de sa présence',true)]),
+ "La pensée de la mort : une présence physique, un poids sur les épaules");
+})();
+
 addLocked("ddc",{"titre":"Bicêtre : écrire pour tenir (ch. 3-9)","sous":"La prison · le pourvoi · pourquoi écrire · que gagne la société ? · la mère, la femme, Marie"});
 addLocked("ddc",{"titre":"Le cachot et les murs qui parlent (ch. 10-12)","sous":"Description du cachot · les inscriptions · les noms des suppliciés · la peur qui monte"});
 addLocked("ddc",{"titre":"Le ferrement des forçats (ch. 13-14)","sous":"La cour de Bicêtre · la chaîne pour Toulon · les colliers de fer · le chant et la pluie · l'évanouissement"});
@@ -741,6 +853,16 @@ addChap('antigone',{
  ]
 });
 
+/* === antigone/02-seq02.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('antigone',1,0,S([B.exterieur({ciel:'#8e9aab',ciel2:'#e8d9c8',sol:'#6b7a6b',sol2:'#5c6e5c',soleil:false}),'<circle cx="290" cy="40" r="12" fill="#f3e6c9" opacity=".8"/>',
+ '<g fill="#5c6e5c"><ellipse cx="60" cy="150" rx="40" ry="14"/><ellipse cx="300" cy="152" rx="50" ry="16"/></g><g fill="#b5452c" opacity=".7"><circle cx="50" cy="142" r="3"/><circle cx="75" cy="146" r="3"/><circle cx="290" cy="144" r="3"/><circle cx="320" cy="148" r="3"/></g>',
+ P({x:180,y:200,h:120,expr:'serein',hairstyle:'court',hair:'#1a1210',dress:'#b5452c',dress2:'#7a2e20',arms:'porte',skin:'clair',tenu:'<g fill="#8a6d3b"><ellipse cx="-10" cy="4" rx="7" ry="3"/><ellipse cx="4" cy="6" rx="7" ry="3"/></g>'}),
+ '<g fill="#f3d2ad"><ellipse cx="172" cy="202" rx="6" ry="3"/><ellipse cx="190" cy="202" rx="6" ry="3"/></g>',
+ p.titre('Le jardin, avant que les autres ne se réveillent',false),p.legende('Un monde gris, sans couleurs, encore à personne',true)]),
+ "Antigone rentre pieds nus, ses sandales à la main, le visage encore plein du jardin gris");
+})();
+
 /* === antigone/03-seq03.js === */
 addChap('antigone',{
  titre:"Antigone et Ismène",
@@ -775,6 +897,16 @@ addChap('antigone',{
   {t:"Réaction personnelle",s:"Ismène dit qu'il faut « comprendre » ; Antigone refuse. Qui a raison selon vous ? 3 lignes.",open:true,m:"Position + arguments + exemple. Ex. : Ismène a raison de peser les conséquences : le courage sans réflexion peut être inutile. Mais Antigone a raison de ne pas accepter l'inacceptable, car « comprendre » devient souvent une excuse pour se soumettre. L'idéal est un refus réfléchi."}
  ]
 });
+
+/* === antigone/03-seq03.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('antigone',2,0,S([B.palais(),
+ P({x:100,y:205,h:120,expr:'severe',hairstyle:'court',hair:'#1a1210',dress:'#b5452c',dress2:'#7a2e20',arms:'croise',skin:'clair'}),
+ P({x:260,y:205,h:125,expr:'peur',hairstyle:'long',hair:'#e8c46a',dress:'#d9a441',arms:'tend',flip:true,skin:'clair'}),
+ p.bulle(100,60,'Je ne veux pas comprendre','#fae4df'),p.bulle(260,60,'Il faut comprendre…','#fff3e0'),
+ p.nom(100,218,'Antigone','#f3e6c9'),p.nom(260,218,'Ismène','#f3e6c9')]),
+ "La raison contre l'absolu : Ismène supplie les mains ouvertes, Antigone se ferme, bras croisés");
+})();
 
 /* === antigone/04-seq04.js === */
 addChap('antigone',{
@@ -815,6 +947,22 @@ addChap('antigone',{
  ]
 });
 
+/* === antigone/04-seq04.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('antigone',3,0,S([B.palais(),
+ P({x:90,y:205,h:125,expr:'triste',hairstyle:'voile',veil:'#8a6d3b',hair:'#ddd',dress:'#6e5a4a',arms:'tend',skin:'clair'}),
+ P({x:230,y:205,h:120,expr:'triste',hairstyle:'court',hair:'#1a1210',dress:'#b5452c',dress2:'#7a2e20',arms:'pointe',flip:true,skin:'clair',regard:-3}),
+ '<g transform="translate(160,200)"><ellipse cx="0" cy="0" rx="22" ry="10" fill="#c9a97a"/><circle cx="-18" cy="-8" r="9" fill="#c9a97a"/><path d="M-25 -14 l-3 -8 l6 3Z M-14 -14 l3 -8 l-6 3Z" fill="#c9a97a"/><circle cx="-20" cy="-8" r="1.5" fill="#2b2118"/><path d="M20 -2 q8 -10 4 -18" stroke="#c9a97a" stroke-width="4" fill="none"/></g>',
+ p.bulle(230,60,'Tu lui parleras, à Douce…','#fae4df'),p.nom(160,218,'Douce','#f3e6c9')]),
+ "Antigone confie sa chienne à la Nourrice : un testament que personne ne reconnaît");
+I.set('antigone',3,2,S([B.nuit({fond:'#2b2a3a',lum:'#9c4f7a',cy:120}),p.etoiles(),
+ P({x:130,y:205,h:120,expr:'triste',hairstyle:'court',hair:'#1a1210',dress:'#b5452c',dress2:'#7a2e20',arms:'tend',skin:'clair',regard:3}),
+ P({x:210,y:205,h:128,expr:'surprise',hairstyle:'court',dress:'#1f6f78',arms:'porte',flip:true,skin:'clair'}),
+ '<g opacity=".3" fill="#f3e6c9"><circle cx="300" cy="80" r="10"/><ellipse cx="300" cy="106" rx="9" ry="15"/></g><text x="300" y="134" text-anchor="middle" font-size="8" fill="#f3e6c9" opacity=".6">l’enfant imaginé</text>',
+ p.titre('Une mère qu’il n’aura jamais',true),p.legende('« Tu l’aurais aimée, notre petit garçon ? »',true)]),
+ "Antigone parle au conditionnel de l'enfant qu'ils auraient eu ; Hémon ne comprend pas ce temps du regret");
+})();
+
 /* === antigone/05-seq05.js === */
 addChap('antigone',{
  titre:"« C'est fait » et le rapport du garde",
@@ -852,6 +1000,17 @@ addChap('antigone',{
  ]
 });
 
+/* === antigone/05-seq05.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('antigone',4,2,S([B.palais(),
+ P({x:80,y:205,h:130,expr:'severe',hairstyle:'blanc',dress:'#2b2118',dress2:'#000',arms:'croise',skin:'clair'}),
+ P({x:230,y:205,h:120,expr:'peur',hairstyle:'court',hair:'#3a2a1a',dress:'#4f4f4f',dress2:'#333',arms:'tend',flip:true,skin:'moyen',ceinture:'#8a6d3b'}),
+ '<rect x="214" y="90" width="32" height="10" rx="3" fill="#2b2118"/>',
+ '<g transform="translate(300,150)"><ellipse cx="25" cy="30" rx="30" ry="8" fill="#8a6d3b"/><ellipse cx="25" cy="30" rx="18" ry="5" fill="#a46a3a"/></g><text x="325" y="200" text-anchor="middle" font-size="8" fill="#c9b48e">la terre sur le corps</text>',
+ p.bulle(230,55,'Quelqu’un a recouvert le corps…','#fff3e0'),p.nom(80,218,'Créon','#f3e6c9'),p.nom(230,218,'Jonas, le garde','#f3e6c9')]),
+ "Le garde, casquette de travers, bafouille son rapport ; Créon écoute, bras croisés, le regard dur");
+})();
+
 /* === antigone/06-seq06.js === */
 addChap('antigone',{
  titre:"Le Chœur sur la tragédie et l'arrestation",
@@ -886,6 +1045,22 @@ addChap('antigone',{
   {t:"Réaction personnelle",s:"Préférez-vous les histoires où l'on peut encore s'en sortir (le drame) ou celles où tout est joué d'avance (la tragédie) ? 3 lignes.",open:true,m:"Position + arguments + exemple. Ex. : Je préfère le drame : l'espoir rend l'histoire vivante et permet de s'identifier. Pourtant, la tragédie fascine par la grandeur de ceux qui vont jusqu'au bout en sachant tout, comme Antigone. Elle apprend quelque chose sur la liberté dans la contrainte."}
  ]
 });
+
+/* === antigone/06-seq06.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('antigone',5,0,S([B.palais(),
+ P({x:60,y:205,h:125,expr:'serein',hairstyle:'court',hair:'#555',dress:'#4a3b5c',arms:'pointe',skin:'clair'}),
+ '<g transform="translate(130,60)"><rect x="0" y="0" width="200" height="100" rx="8" fill="#2b2a3a" stroke="#d9a441"/><g stroke="#d9a441" stroke-width="2" fill="none"><path d="M20 70 q10-40 20-10 q10 30 20 -10 q10-40 20 -10 q10 30 20 -10 q10-40 20 -10 q10 30 20 -10"/></g><circle cx="20" cy="70" r="4" fill="#b5452c"/><circle cx="160" cy="30" r="4" fill="#b5452c"/><text x="100" y="92" text-anchor="middle" font-size="9" fill="#f3e6c9">ressort bandé → ça se déroule tout seul</text></g>',
+ p.titre('Tragédie : propre, reposante, sûre',true),p.legende('Drame : on pourrait encore s’en sortir. Tragédie : non.',true)]),
+ "Le Chœur arrête l'action pour expliquer la mécanique tragique");
+I.set('antigone',5,1,S([B.palais(),
+ P({x:90,y:205,h:125,expr:'joie',hairstyle:'court',hair:'#3a2a1a',dress:'#4f4f4f',dress2:'#333',arms:'pointe',skin:'moyen',ceinture:'#8a6d3b'}),'<rect x="74" y="88" width="32" height="10" rx="3" fill="#2b2118"/>',
+ P({x:180,y:205,h:118,expr:'severe',hairstyle:'court',hair:'#1a1210',dress:'#b5452c',dress2:'#7a2e20',arms:'bas',skin:'clair',regard:0}),
+ P({x:270,y:205,h:125,expr:'joie',hairstyle:'court',hair:'#2b1d12',dress:'#4f4f4f',dress2:'#333',arms:'pointe',flip:true,skin:'mat',ceinture:'#8a6d3b'}),'<rect x="254" y="88" width="32" height="10" rx="3" fill="#2b2118"/>',
+ '<g transform="translate(330,120)">'+p.pelle(0,0)+'</g>','<g fill="#8a6d3b"><path d="M168 200 q12 -6 24 0" stroke="#8a6d3b" stroke-width="3" fill="none"/></g>',
+ p.bulle(90,55,'La prime !','#fff3e0'),p.titre('Prise en flagrant délit, en plein jour',true)]),
+ "Les gardes ricanent et tiennent la « petite » par les poignets ; Antigone, droite, ne baisse pas les yeux");
+})();
 
 /* === antigone/07-seq07.js === */
 addChap('antigone',{
@@ -926,6 +1101,22 @@ addChap('antigone',{
  ]
 });
 
+/* === antigone/07-seq07.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('antigone',6,1,S([B.palais(),
+ P({x:90,y:205,h:132,expr:'surprise',hairstyle:'blanc',dress:'#2b2118',dress2:'#000',arms:'tend',skin:'clair'}),
+ P({x:270,y:205,h:120,expr:'severe',hairstyle:'court',hair:'#1a1210',dress:'#b5452c',dress2:'#7a2e20',arms:'hanches',flip:true,skin:'clair'}),
+ p.bulle(90,55,'Pour qui ?','#fff3e0'),p.bulle(270,55,'Pour personne. Pour moi.','#fae4df'),
+ p.titre('Le cœur du conflit',true),p.nom(90,218,'Créon','#f3e6c9'),p.nom(270,218,'Antigone','#f3e6c9')]),
+ "Antigone n'agit ni pour les dieux ni pour la foule, mais pour elle-même");
+I.set('antigone',6,3,S([B.nuit({fond:'#2b2a3a',lum:'#8a8494',cy:110}),
+ '<g fill="#4f4f4f"><rect x="50" y="80" width="100" height="60" rx="8"/><rect x="210" y="80" width="100" height="60" rx="8"/></g><g font-size="10" text-anchor="middle" fill="#f3e6c9" font-weight="700"><text x="100" y="114">Étéocle ?</text><text x="260" y="114">Polynice ?</text></g><text x="180" y="118" text-anchor="middle" font-size="22" fill="#d9a441">?</text>',
+ P({x:60,y:205,h:70,expr:'severe',hairstyle:'blanc',dress:'#2b2118',dress2:'#000',arms:'pointe',skin:'clair'}),
+ P({x:300,y:205,h:66,expr:'triste',hairstyle:'court',hair:'#1a1210',dress:'#b5452c',dress2:'#7a2e20',arms:'visage',flip:true,skin:'clair'}),
+ p.titre('Deux corps en bouillie, méconnaissables',true),p.legende('On a enterré « le moins abîmé » et appelé l’autre Polynice',true)]),
+ "La vérité d'État : le héros et le traître sont interchangeables ; Antigone vacille");
+})();
+
 /* === antigone/08-seq08.js === */
 addChap('antigone',{
  titre:"Créon et Antigone (2) : le bonheur",
@@ -962,6 +1153,16 @@ addChap('antigone',{
   {t:"Réaction personnelle",s:"« Tout, tout de suite, ou rien » : est-ce une attitude admirable ou dangereuse ? 3 lignes.",open:true,m:"Position nuancée + arguments + exemple. Ex. : Admirable, car elle refuse l'hypocrisie et les renoncements qui abîment une vie. Dangereuse, car elle méprise la patience et le compromis nécessaires pour construire quoi que ce soit, et elle conduit à la mort. La maturité consiste peut-être à garder l'exigence d'Antigone sans son refus de vivre."}
  ]
 });
+
+/* === antigone/08-seq08.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('antigone',7,1,S([B.palais(),
+ '<g font-size="9" text-anchor="middle" font-weight="700"><rect x="14" y="40" width="130" height="92" rx="10" fill="#2b2118" opacity=".85"/><text x="79" y="60" fill="#d9a441" font-size="11">CRÉON</text><text x="79" y="78" fill="#fff" font-weight="400">le bonheur modeste</text><text x="79" y="92" fill="#fff" font-weight="400">accepter, vieillir</text><text x="79" y="106" fill="#fff" font-weight="400">les petites joies</text><text x="79" y="120" fill="#fff" font-weight="400">dire oui</text><rect x="216" y="40" width="130" height="92" rx="10" fill="#b5452c" opacity=".9"/><text x="281" y="60" fill="#f3e6c9" font-size="11">ANTIGONE</text><text x="281" y="78" fill="#fff" font-weight="400">tout, tout de suite</text><text x="281" y="92" fill="#fff" font-weight="400">refuser, rester pure</text><text x="281" y="106" fill="#fff" font-weight="400">l’absolu ou la mort</text><text x="281" y="120" fill="#fff" font-weight="400">dire non</text></g><text x="180" y="95" text-anchor="middle" font-size="18" fill="#f3e6c9">≠</text>',
+ P({x:79,y:205,h:75,expr:'triste',hairstyle:'blanc',dress:'#2b2118',dress2:'#000',arms:'tend',skin:'clair'}),
+ P({x:281,y:205,h:72,expr:'colere',hairstyle:'court',hair:'#1a1210',dress:'#b5452c',dress2:'#7a2e20',arms:'leve',skin:'clair'}),
+ p.titre('Deux conceptions du bonheur',true)]),
+ "Créon défend la vie ordinaire ; Antigone, poings levés, refuse le « petit bonheur »");
+})();
 
 /* === antigone/09-seq09.js === */
 addChap('antigone',{
@@ -1002,6 +1203,20 @@ addChap('antigone',{
  ]
 });
 
+/* === antigone/09-seq09.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('antigone',8,1,S([B.palais(),
+ P({x:120,y:205,h:135,expr:'severe',hairstyle:'blanc',dress:'#2b2118',dress2:'#000',arms:'bas',skin:'clair'}),
+ P({x:230,y:205,h:120,pose:'genoux',expr:'pleur',hairstyle:'court',dress:'#1f6f78',arms:'priere',flip:true,skin:'clair'}),
+ p.bulle(230,60,'Père, ce n’est pas vrai…','#e4f1f2'),p.nom(120,218,'Créon','#f3e6c9'),p.nom(230,218,'Hémon, à genoux','#f3e6c9')]),
+ "Le fils découvre que son père tout-puissant n'est qu'un homme qui a peur");
+I.set('antigone',8,2,S([B.cachot(),
+ P({x:110,y:205,h:120,pose:'assis',expr:'triste',hairstyle:'court',hair:'#1a1210',dress:'#b5452c',dress2:'#7a2e20',arms:'bas',skin:'clair',regard:3}),
+ P({x:250,y:205,h:128,expr:'joie',hairstyle:'court',hair:'#3a2a1a',dress:'#4f4f4f',dress2:'#333',arms:'porte',flip:true,skin:'moyen',ceinture:'#8a6d3b',tenu:p.lettre(-14,-8)+'<rect x="16" y="-12" width="3" height="14" fill="#2b2118"/>'}),'<rect x="234" y="86" width="32" height="10" rx="3" fill="#2b2118"/>',
+ p.bulle(250,55,'…et le grade, voyez-vous…','#fff3e0'),p.titre('La dernière lettre',true)]),
+ "Le garde écrit la lettre d'Antigone entre deux remarques sur sa solde");
+})();
+
 /* === antigone/10-seq10.js === */
 addChap('antigone',{
  titre:"Le dénouement",
@@ -1041,6 +1256,22 @@ addChap('antigone',{
   {t:"Réaction personnelle",s:"Après avoir étudié la pièce, qui vous semble avoir raison, Antigone ou Créon ? Justifiez en 4 lignes.",open:true,m:"Position argumentée + nuance + exemple. Ex. : Antigone a raison de refuser une vie de compromis et de mensonge : son non garde sa dignité. Mais Créon a raison de rappeler que quelqu'un doit faire tourner la cité et que l'absolu peut être cruel (Ismène repoussée, Hémon abandonné). La pièce ne tranche pas : elle montre que chacun paie son choix. Personnellement, je garde l'exigence d'Antigone et le sens des responsabilités de Créon."}
  ]
 });
+
+/* === antigone/10-seq10.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('antigone',9,0,S([B.nuit({fond:'#2b2a3a',lum:'#8a8494',cy:130}),
+ '<path d="M80 170 V100 a60 60 0 0 1 120 0 V170Z" fill="#4f4f4f"/><rect x="80" y="170" width="120" height="8" fill="#3a3a3a"/>',
+ '<g transform="translate(140,150)"><ellipse cx="0" cy="0" rx="26" ry="8" fill="#b5452c" opacity=".85"/></g>',
+ P({x:170,y:170,h:80,pose:'genoux',expr:'pleur',hairstyle:'court',dress:'#1f6f78',arms:'visage',skin:'clair'}),
+ P({x:300,y:205,h:125,expr:'triste',hairstyle:'court',hair:'#ddd',dress:'#555',dress2:'#333',arms:'tend',flip:true,skin:'clair'}),
+ p.titre('Dans le tombeau',true),p.legende('Antigone pendue à sa ceinture, Hémon contre elle',true),p.nom(300,60,'le Messager','#f3e6c9')]),
+ "Le Messager raconte : on a ouvert le tombeau trop tard");
+I.set('antigone',9,2,S([B.palais(),
+ P({x:150,y:205,h:138,expr:'triste',hairstyle:'blanc',dress:'#2b2118',dress2:'#000',arms:'bas',skin:'clair',regard:2}),
+ P({x:230,y:208,h:72,expr:'joie',hairstyle:'court',dress:'#5aa9d6',arms:'bas',skin:'clair',regard:-3}),
+ p.bulle(150,50,'Il ne faut jamais devenir grand','#fff3e0'),p.bulle(300,120,'Conseil à cinq heures','#e4f1f2'),p.nom(150,218,'Créon, seul','#f3e6c9'),p.nom(230,218,'le Page','#f3e6c9')]),
+ "Le roi a tout perdu ; il reste le travail et un enfant pressé de grandir");
+})();
 
 /* === antigone/90-ar.js === */
 addAr('antigone',1,{tip:"أول مشهد حقيقي: حوار حميم يكشف حساسية أنتيغون ويرسّخ السخرية التراجيدية.",ep:[
@@ -1193,6 +1424,25 @@ addChap('bam',{
  ]
 });
 
+/* === bam/02-ch02.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+/* Le Msid */
+I.set('bam',1,0,S([B.salle({fenetre:false,tapis:false}),'<rect x="0" y="0" width="360" height="118" fill="#3b2a1a" opacity=".35"/>','<rect x="120" y="18" width="120" height="34" rx="4" fill="#8a6d3b"/><text x="180" y="40" text-anchor="middle" font-size="12" font-weight="700" fill="#f3e6c9">المسيد</text>',
+ P({x:300,y:200,h:135,expr:'severe',hairstyle:'turban',beard:'#555',dress:'#2b2118',arms:'pointe',flip:true,tenu:'<line x1="0" y1="0" x2="-60" y2="-30" stroke="#5a4330" stroke-width="4" stroke-linecap="round"/>'}),
+ P({x:60,y:205,h:70,pose:'assis',expr:'peur',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'porte',tenu:p.livre(-12,-6,'#d9a441')}),
+ P({x:125,y:205,h:70,pose:'assis',expr:'triste',dress:'#e9e3d6',dress2:'#cfc8ba',arms:'porte',tenu:p.livre(-12,-6,'#d9a441'),skin:'mat'}),
+ P({x:190,y:205,h:70,pose:'assis',expr:'peur',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'porte',tenu:p.livre(-12,-6,'#d9a441'),skin:'clair'}),
+ p.legende('Planchettes, récitation en chœur, baguette du fqih',false)]),
+ "Le Msid : le fqih et sa baguette, les élèves apeurés sur leurs planchettes");
+/* Sidi Boughaleb et les chats */
+I.set('bam',1,3,S([B.exterieur({sol:'#c9b48e',sol2:'#b0a08a'}),'<rect x="100" y="70" width="160" height="80" fill="#f4ebd8" stroke="#8a6d3b" stroke-width="2"/><path d="M100 70 Q180 15 260 70Z" fill="#2e7d4f"/><rect x="165" y="100" width="30" height="50" fill="#5a4330"/><path d="M165 100 a15 15 0 0 1 30 0Z" fill="#5a4330"/>',
+ P({x:70,y:205,h:120,expr:'pleur',hairstyle:'voile',veil:'#1f6f78',dress:'#2f6f78',arms:'priere'}),P({x:300,y:205,h:128,expr:'pleur',hairstyle:'voile',veil:'#8a6d3b',dress:'#7a5a3a',arms:'priere',skin:'mat'}),
+ p.chatAssis(40,195,'#555'),p.chatAssis(330,200,'#c9a97a'),p.chat(110,180,'#777'),p.chatAssis(250,200,'#e8d9b8'),
+ P({x:185,y:208,h:68,expr:'peur',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'tend'}),'<g stroke="#b5452c" stroke-width="2"><line x1="206" y1="178" x2="212" y2="186"/><line x1="210" y1="176" x2="216" y2="184"/></g>',
+ p.titre('Sidi Boughaleb, le saint des chats',false)]),
+ "Au sanctuaire, les femmes prient en pleurant ; l'enfant, griffé, retire sa main");
+})();
+
 /* === bam/03-ch03.js === */
 addChap('bam',{
  titre:"La lampe à pétrole et Zineb perdue",
@@ -1229,6 +1479,22 @@ addChap('bam',{
   {t:"Réaction personnelle",s:"La jalousie entre voisines est-elle, selon vous, un défaut grave ou un trait humain compréhensible ? 3 lignes.",open:true,m:"Position + arguments + exemple. Ex. : C'est un trait humain : chacun compare sa vie à celle des autres, comme Lalla Zoubida avec la lampe. Mais la jalousie devient grave quand elle détruit les relations ; ici, elle reste légère et la solidarité l'emporte lors de la disparition de Zineb."}
  ]
 });
+
+/* === bam/03-ch03.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('bam',2,1,S([B.salle({fenetre:false,tapis:false}),'<rect width="360" height="220" fill="#1b1410" opacity=".72"/>',p.lampe(250,70),p.bougie(70,150),
+ P({x:290,y:205,h:120,expr:'joie',hairstyle:'voile',veil:'#5aa9d6',dress:'#3a7fa0',arms:'hanches',skin:'clair'}),
+ P({x:110,y:205,h:125,expr:'colere',hairstyle:'voile',veil:'#1f6f78',dress:'#2f6f78',arms:'croise',regard:4}),
+ P({x:180,y:212,h:60,expr:'surprise',dress:'#f4f0e6',dress2:'#d8d2c4'}),
+ p.nom(110,218,'Lalla Zoubida','#f3e6c9'),p.nom(290,218,'Fatma Bziouya','#f3e6c9'),p.titre('Une lumière qui fait des envieuses',true)]),
+ "La lampe de Fatma Bziouya éclaire tout l'étage ; Lalla Zoubida, bras croisés, n'a qu'une bougie");
+I.set('bam',2,2,S([B.rue({}),p.foule(30,150,4),
+ P({x:80,y:212,h:125,expr:'pleur',hairstyle:'voile',veil:'#b5452c',dress:'#a8402a',arms:'leve',skin:'mat'}),
+ P({x:150,y:212,h:118,expr:'peur',hairstyle:'voile',veil:'#1f6f78',dress:'#2f6f78',arms:'pointe'}),
+ P({x:300,y:214,h:55,expr:'pleur',hairstyle:'long',dress:'#d9a441',arms:'bas'}),
+ '<rect x="250" y="80" width="110" height="100" fill="#2b2118" opacity=".25"/>',p.bulle(80,70,'Zineb !','#fae4df'),p.titre('Les ruelles de Fès : une enfant perdue',false)]),
+ "Rahma hurle, Lalla Zoubida montre la ruelle : toute la maison cherche la petite Zineb");
+})();
 
 /* === bam/04-ch04.js === */
 addChap('bam',{
@@ -1267,6 +1533,22 @@ addChap('bam',{
  ]
 });
 
+/* === bam/04-ch04.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('bam',3,1,S([B.rue({}),'<rect x="20" y="60" width="140" height="120" fill="#e8d4b0" stroke="#8a6d3b"/><text x="90" y="52" text-anchor="middle" font-size="10" font-weight="700" fill="#2b2118">Atelier de babouches</text><g fill="#d9a441"><path d="M35 90 q10-8 20 0 q-2 8 -18 8Z"/><path d="M65 90 q10-8 20 0 q-2 8 -18 8Z"/><path d="M95 90 q10-8 20 0 q-2 8 -18 8Z"/><path d="M125 90 q10-8 20 0 q-2 8 -18 8Z"/></g><g fill="#b5452c"><path d="M35 112 q10-8 20 0 q-2 8 -18 8Z"/><path d="M65 112 q10-8 20 0 q-2 8 -18 8Z"/><path d="M95 112 q10-8 20 0 q-2 8 -18 8Z"/></g>',
+ P({x:210,y:208,h:125,expr:'triste',hairstyle:'fez',dress:'#4a3b5c',arms:'tend',skin:'moyen'}),
+ P({x:310,y:208,h:125,expr:'joie',hairstyle:'court',beard:true,dress:'#7a6a58',arms:'porte',flip:true,tenu:'<rect x="-14" y="-6" width="28" height="18" fill="#d9a441" stroke="#8a6d3b"/>',skin:'mat'}),
+ p.bulle(285,66,"À moi !",'#fff3e0'),p.nom(210,218,'Moulay Larbi','#4a3b5c'),p.nom(310,218,'Abdelkader','#5a4a3a')]),
+ "L'associé repart avec la caisse ; Moulay Larbi, les mains vides, ne comprend pas");
+I.set('bam',3,3,S([B.nuit({fond:'#2a1f30',lum:'#d9a441',cy:160}),p.etoiles(),p.bougie(180,165),
+ P({x:180,y:205,h:130,expr:'serein',hairstyle:'turban',beard:'#3a2a1a',dress:'#f3ecdc',dress2:'#d8cdb6',arms:'tend'}),
+ P({x:80,y:212,h:70,pose:'assis',expr:'joie',dress:'#f4f0e6',dress2:'#d8d2c4',regard:4}),
+ P({x:290,y:210,h:110,pose:'assis',expr:'serein',hairstyle:'voile',veil:'#1f6f78',dress:'#2f6f78',flip:true}),
+ '<g fill="#fff" opacity=".8"><circle cx="250" cy="40" r="2"/><circle cx="110" cy="35" r="1.6"/></g>',
+ p.titre('Le soir, le père raconte…',true),p.legende("Les histoires d'Abdallah l'épicier",true)]),
+ "La veillée : le père, bras ouverts, fait vivre les contes d'Abdallah ; l'enfant boit ses paroles");
+})();
+
 /* === bam/05-ch05.js === */
 addChap('bam',{
  titre:"L'annonce de l'Achoura et la mort du coiffeur",
@@ -1300,6 +1582,17 @@ addChap('bam',{
   {t:"Réaction personnelle",s:"Faut-il, selon vous, protéger les enfants de la réalité de la mort ou leur en parler ? 3 lignes.",open:true,m:"Position + 2 arguments + exemple. Ex. : Il faut leur en parler avec des mots simples, car le silence crée l'angoisse, comme le cauchemar de Sidi Mohammed. La mère a raison de le rassurer par le paradis. Un enfant informé avec douceur grandit plus sereinement."}
  ]
 });
+
+/* === bam/05-ch05.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('bam',4,1,S([B.rue({}),'<rect width="360" height="220" fill="#8e8a80" opacity=".25"/>',
+ '<g fill="#fff" stroke="#8a6d3b"><path d="M60 120 h110 v26 h-110Z"/><path d="M60 120 l55 -16 l55 16Z"/></g>',
+ P({x:190,y:205,h:120,expr:'triste',hairstyle:'turban',beard:'#555',dress:'#2b2118',arms:'porte'}),P({x:230,y:205,h:120,expr:'triste',hairstyle:'turban',dress:'#2b2118',arms:'porte',skin:'mat'}),P({x:270,y:205,h:120,expr:'serein',yeuxFermes:true,hairstyle:'turban',beard:true,dress:'#2b2118',arms:'porte'}),
+ P({x:40,y:208,h:115,expr:'pleur',hairstyle:'voile',veil:'#2b2118',dress:'#3a3a3a',arms:'visage'}),P({x:90,y:208,h:110,expr:'pleur',hairstyle:'voile',veil:'#4a4a4a',dress:'#555',arms:'leve',skin:'mat'}),
+ P({x:325,y:212,h:62,expr:'surprise',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'croise'}),
+ p.fumee(140,150,'#aaa'),p.titre('Le cortège funèbre',false),p.legende("L'enfant découvre la mort",false)]),
+ "Le cortège du coiffeur : les pleureuses, les hommes qui portent, et l'enfant qui regarde sans comprendre");
+})();
 
 /* === bam/06-ch06.js === */
 addChap('bam',{
@@ -1340,6 +1633,22 @@ addChap('bam',{
  ]
 });
 
+/* === bam/06-ch06.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('bam',5,0,S([B.salle({fenetre:false,tapis:false}),'<g stroke="#1f6f78" stroke-width="2" fill="none"><path d="M20 40 q20-20 40 0 q20 20 40 0 q20-20 40 0 q20 20 40 0 q20-20 40 0 q20 20 40 0 q20-20 40 0"/></g><g fill="#d9a441"><circle cx="40" cy="40" r="3"/><circle cx="120" cy="40" r="3"/><circle cx="200" cy="40" r="3"/><circle cx="280" cy="40" r="3"/></g>',
+ P({x:60,y:205,h:70,pose:'genoux',expr:'neutre',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'tend',skin:'mat'}),P({x:130,y:205,h:70,pose:'genoux',expr:'joie',dress:'#e9e3d6',dress2:'#cfc8ba',arms:'tend'}),P({x:300,y:205,h:70,pose:'genoux',expr:'neutre',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'tend',skin:'clair'}),
+ P({x:215,y:205,h:85,expr:'joie',dress:'#f3b54a',dress2:'#d9a441',arms:'pointe',regard:-2}),
+ '<g fill="#8a6d3b"><rect x="45" y="200" width="18" height="6" rx="2"/><rect x="115" y="200" width="18" height="6" rx="2"/><rect x="285" y="200" width="18" height="6" rx="2"/></g><ellipse cx="180" cy="208" rx="160" ry="6" fill="#9fc3cc" opacity=".35"/>',
+ p.bulle(215,100,'Frottez ici !','#fff3e0'),p.titre('Grand nettoyage du Msid',false),p.nom(215,218,'chef des frotteurs','#b5452c')]),
+ "Pour une fois, Sidi Mohammed commande : chef des frotteurs, il dirige ses camarades à genoux");
+I.set('bam',5,1,S([B.rue({}),'<g><rect x="20" y="40" width="100" height="100" fill="#e8d4b0" stroke="#8a6d3b"/><rect x="130" y="40" width="100" height="100" fill="#e8d4b0" stroke="#8a6d3b"/><rect x="240" y="40" width="100" height="100" fill="#e8d4b0" stroke="#8a6d3b"/></g><g><path d="M35 55 h20 v50 h-20Z" fill="#b5452c"/><path d="M60 55 h20 v50 h-20Z" fill="#1f6f78"/><path d="M85 55 h20 v50 h-20Z" fill="#d9a441"/><path d="M145 55 h20 v50 h-20Z" fill="#2e7d4f"/><path d="M170 55 h20 v50 h-20Z" fill="#9c4f7a"/><path d="M195 55 h20 v50 h-20Z" fill="#5aa9d6"/><circle cx="265" cy="80" r="14" fill="#d9a441"/><circle cx="295" cy="80" r="14" fill="#b5452c"/><circle cx="325" cy="80" r="14" fill="#1f6f78"/></g>',
+ P({x:90,y:208,h:125,expr:'severe',hairstyle:'voile',veil:'#1f6f78',dress:'#2f6f78',arms:'pointe'}),
+ P({x:230,y:208,h:120,expr:'joie',hairstyle:'fez',beard:'#555',dress:'#8a6d3b',arms:'tend',flip:true,skin:'mat',tenu:'<path d="M-10 -12 h20 v22 h-20Z" fill="#d9a441"/>'}),
+ P({x:150,y:212,h:65,expr:'joie',dress:'#b5452c',dress2:'#8a3b2a',arms:'bas',regard:3}),
+ p.bulle(90,60,'Trop cher !','#e4f1f2'),p.titre('La Kissaria : étoffes, couleurs, marchandage',false)]),
+ "Lalla Zoubida marchande ferme ; l'enfant, déjà dans son gilet rouge, n'en revient pas");
+})();
+
 /* === bam/07-ch07.js === */
 addChap('bam',{
  titre:"Le jour de l'Achoura",
@@ -1376,6 +1685,21 @@ addChap('bam',{
   {t:"Réaction personnelle",s:"Quelle fête de votre enfance vous a le plus marqué(e) et pourquoi ? 3 lignes.",open:true,m:"Récit bref + sentiment + explication. Ex. : L'Aïd chez mes grands-parents : les habits neufs, la maison pleine, les cousins. Ce qui m'a marqué, c'est le sentiment d'appartenir à une grande famille, comme Sidi Mohammed au Msid."}
  ]
 });
+
+/* === bam/07-ch07.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('bam',6,0,S([B.rue({}),'<g><rect x="30" y="100" width="120" height="80" fill="#e8d4b0" stroke="#8a6d3b"/>'+p.tambour(60,120)+p.tambour(110,125)+'<path d="M200 140 l70 -30 l0 20 l-70 20Z" fill="#d9a441"/><ellipse cx="272" cy="120" rx="8" ry="14" fill="#f3b54a"/></g>',
+ P({x:200,y:208,h:130,expr:'serein',hairstyle:'turban',beard:'#3a2a1a',dress:'#f3ecdc',dress2:'#d8cdb6',arms:'porte',tenu:'<rect x="-10" y="-20" width="20" height="8" fill="#5a4330"/>'}),
+ P({x:150,y:212,h:70,expr:'joie',dress:'#b5452c',dress2:'#8a3b2a',arms:'porte',tenu:'<g transform="scale(.6)">'+p.tambour(0,-10)+'</g>'}),
+ '<g fill="#2b2118" opacity=".7" font-size="16"><text x="80" y="90">♪</text><text x="300" y="80">♫</text><text x="250" y="60">♪</text></g>',
+ p.titre('Le souk des jouets, veille de fête',false)]),
+ "Veille d'Achoura : le père achète, l'enfant serre déjà son tambour contre lui");
+I.set('bam',6,2,S([B.salle({fenetre:false,tapis:false}),'<g stroke="#1f6f78" stroke-width="2" fill="none"><path d="M20 30 q25-20 50 0 q25 20 50 0 q25-20 50 0 q25 20 50 0 q25-20 50 0 q25 20 50 0"/></g><g><polygon points="45,30 50,42 40,42" fill="#b5452c"/><polygon points="95,30 100,42 90,42" fill="#d9a441"/><polygon points="145,30 150,42 140,42" fill="#2e7d4f"/><polygon points="195,30 200,42 190,42" fill="#b5452c"/><polygon points="245,30 250,42 240,42" fill="#d9a441"/><polygon points="295,30 300,42 290,42" fill="#2e7d4f"/></g>',p.bougie(60,120),p.bougie(300,120),
+ P({x:180,y:205,h:135,expr:'joie',hairstyle:'turban',turban:'#fff',beard:'#555',dress:'#2e7d4f',dress2:'#1f5a38',arms:'leve'}),
+ P({x:60,y:208,h:72,pose:'genoux',expr:'joie',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'priere'}),P({x:110,y:208,h:72,pose:'genoux',expr:'joie',dress:'#b5452c',dress2:'#8a3b2a',arms:'priere'}),P({x:250,y:208,h:72,pose:'genoux',expr:'joie',dress:'#e9e3d6',dress2:'#cfc8ba',arms:'priere',skin:'mat'}),P({x:300,y:208,h:72,pose:'genoux',expr:'joie',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'priere',skin:'clair'}),
+ p.titre('Le Msid transformé en salle de fête',false),p.legende('Le fqih, méconnaissable, dirige les chants',false)]),
+ "Matin de l'Achoura : guirlandes, bougies, et un fqih souriant qui lève les bras pour les chants");
+})();
 
 /* === bam/08-ch08.js === */
 addChap('bam',{
@@ -1415,6 +1739,24 @@ addChap('bam',{
  ]
 });
 
+/* === bam/08-ch08.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('bam',7,1,S([B.rue({}),'<g fill="#e8d4b0" stroke="#8a6d3b"><rect x="10" y="60" width="110" height="90"/><rect x="240" y="60" width="110" height="90"/></g><g fill="#d9a441" stroke="#8a6d3b"><circle cx="35" cy="85" r="9"/><circle cx="60" cy="85" r="9"/><circle cx="85" cy="85" r="9"/><circle cx="265" cy="85" r="9"/><circle cx="290" cy="85" r="9"/><circle cx="315" cy="85" r="9"/></g>',
+ P({x:140,y:208,h:135,expr:'colere',hairstyle:'turban',beard:'#3a2a1a',dress:'#f3ecdc',dress2:'#d8cdb6',arms:'pointe'}),
+ P({x:220,y:208,h:130,expr:'colere',hairstyle:'fez',beard:'#555',dress:'#7a6a58',arms:'pointe',flip:true,skin:'mat'}),
+ '<g stroke="#b5452c" stroke-width="2.5"><line x1="170" y1="70" x2="178" y2="60"/><line x1="188" y1="70" x2="180" y2="60"/><line x1="160" y1="85" x2="150" y2="83"/><line x1="200" y1="85" x2="210" y2="83"/></g>',
+ P({x:40,y:212,h:60,expr:'peur',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'visage'}),P({x:320,y:210,h:110,expr:'surprise',hairstyle:'voile',veil:'#1f6f78',dress:'#2f6f78',arms:'visage'}),
+ p.bracelets(180,180),p.titre('Souk des bijoutiers : la bagarre',false),p.nom(140,218,'Maâlem Abdeslem','#2b2118'),p.nom(220,218,'le courtier','#5a4a3a')]),
+ "Le père, d'ordinaire si calme, affronte le courtier ; les bracelets gisent à terre, l'enfant se cache les yeux");
+I.set('bam',7,3,S([B.salle({fenetre:false,tapis:false}),'<rect width="360" height="220" fill="#2b1d12" opacity=".35"/>',
+ '<rect x="40" y="150" width="230" height="40" rx="6" fill="#d8c3a0"/><rect x="40" y="128" width="230" height="30" rx="8" fill="#1f6f78"/><rect x="48" y="120" width="60" height="22" rx="8" fill="#fff" stroke="#c9b48e"/>',
+ '<g transform="translate(80,118) rotate(-8)">'+I.face({r:16,skin:I.SK.moyen,expr:'triste',yeuxFermes:true})+'</g><rect x="58" y="92" width="44" height="9" rx="4" fill="#fff" stroke="#c9b48e"/>',
+ P({x:305,y:205,h:125,expr:'triste',hairstyle:'voile',veil:'#1f6f78',dress:'#2f6f78',arms:'tend',flip:true}),
+ '<g stroke="#b5452c" stroke-width="1.5" fill="none"><path d="M120 100 q5-8 0-16 M130 100 q5-8 0-16 M140 100 q5-8 0-16"/></g>',p.bougie(320,100),
+ p.legende('Fièvre, délire ; la mère au chevet',false)]),
+ "Le choc se paie en fièvre : l'enfant alité sous la couverture, un linge sur le front, sa mère penchée sur lui");
+})();
+
 /* === bam/09-ch09.js === */
 addChap('bam',{
  titre:"La ruine et le départ du père",
@@ -1453,6 +1795,16 @@ addChap('bam',{
  ]
 });
 
+/* === bam/09-ch09.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('bam',8,2,S([B.exterieur({ciel:'#f6d7a7',ciel2:'#fbf0dc',sol:'#d9a441',sol2:'#c9972f'}),'<g stroke="#8a6d3b" stroke-width="1.5"><line x1="30" y1="180" x2="30" y2="155"/><line x1="60" y1="185" x2="60" y2="160"/><line x1="300" y1="180" x2="300" y2="158"/><line x1="330" y1="185" x2="330" y2="162"/><line x1="120" y1="190" x2="120" y2="165"/></g>',
+ '<g font-size="10" fill="#2b2118"><text x="20" y="40">Fès</text><rect x="14" y="46" width="40" height="18" fill="#c9a97a"/><rect x="30" y="36" width="6" height="10" fill="#a8865a"/></g><path d="M56 56 Q110 90 170 120" stroke="#8a6d3b" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/>',
+ P({x:200,y:200,h:135,expr:'severe',hairstyle:'turban',beard:'#3a2a1a',dress:'#f3ecdc',dress2:'#d8cdb6',arms:'porte',tenu:'<path d="M-30 -8 q20 -4 40 6" stroke="#8a6d3b" stroke-width="3" fill="none"/><path d="M26 6 q26 -14 6 -30" stroke="#c9cfd6" stroke-width="4" fill="none" stroke-linecap="round"/>',skin:'mat'}),
+ '<rect x="150" y="150" width="20" height="26" rx="3" fill="#8a6d3b"/>',
+ p.legende('Moissonneur dans les champs, loin de la famille',false)]),
+ "Dans les blés, loin de Fès : le père courbé sur sa faucille, visage fermé, pour ne pas s'endetter");
+})();
+
 /* === bam/10-ch10.js === */
 addChap('bam',{
  titre:"Si El Arafi et les marabouts",
@@ -1490,6 +1842,16 @@ addChap('bam',{
  ]
 });
 
+/* === bam/10-ch10.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('bam',9,0,S([B.nuit({fond:'#3a3028',lum:'#d9a441',cy:140}),
+ P({x:180,y:200,h:135,expr:'serein',hairstyle:'turban',beard:'#ddd',dress:'#4f4f4f',dress2:'#333',arms:'tend',tenu:'<rect x="-28" y="-18" width="56" height="7" rx="3" fill="#2b2118"/>'}),
+ P({x:60,y:208,h:120,expr:'triste',hairstyle:'voile',veil:'#1f6f78',dress:'#2f6f78',arms:'priere'}),P({x:300,y:208,h:125,expr:'pleur',hairstyle:'voile',veil:'#8a6d3b',dress:'#7a5a3a',arms:'priere',skin:'mat'}),
+ P({x:120,y:212,h:62,expr:'surprise',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'croise'}),p.fumee(250,200,'#ddd'),
+ p.titre('Chez Si El Arafi, le voyant aveugle',true),p.nom(60,218,'Lalla Zoubida','#f3e6c9'),p.nom(300,218,'Lalla Aïcha','#f3e6c9')]),
+ "Le voyant aveugle, un bandeau sur les yeux, ouvre les mains ; les deux amies écoutent, apaisées");
+})();
+
 /* === bam/11-ch11.js === */
 addChap('bam',{
  titre:"Chez Lalla Aïcha : le second mariage de Moulay Larbi",
@@ -1524,6 +1886,17 @@ addChap('bam',{
   {t:"Réaction personnelle",s:"Un mariage arrangé par une marieuse peut-il réussir ? Donnez votre avis en 3 lignes.",open:true,m:"Position + arguments + exemple. Ex. : Il peut réussir si les deux familles sont sincères et les époux compatibles, comme beaucoup de mariages d'autrefois. Mais ici, Salama a uni deux personnes mal assorties par intérêt : l'échec était prévisible. Le consentement et la connaissance mutuelle restent essentiels."}
  ]
 });
+
+/* === bam/11-ch11.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('bam',10,1,S([B.salle({fenetre:true,fx:20,tapis:true,tx:180}),p.plateau(180,185),
+ P({x:70,y:205,h:115,pose:'assis',expr:'surprise',hairstyle:'voile',veil:'#1f6f78',dress:'#2f6f78'}),
+ P({x:180,y:195,h:130,expr:'joie',hairstyle:'voile',veil:'#9c4f7a',dress:'#7a3a5e',arms:'tend',skin:'mat'}),
+ P({x:290,y:205,h:115,pose:'assis',expr:'triste',hairstyle:'voile',veil:'#8a6d3b',dress:'#7a5a3a',flip:true,skin:'moyen'}),
+ P({x:330,y:212,h:58,expr:'neutre',dress:'#f4f0e6',dress2:'#d8d2c4',regard:-3}),
+ p.titre('Salama raconte le mariage qu’elle a arrangé',false),p.nom(70,218,'Lalla Zoubida','#1f6f78'),p.nom(180,218,'Salama','#9c4f7a'),p.nom(290,218,'Lalla Aïcha','#5a4a3a')]),
+ "Salama, intarissable, raconte ; Lalla Aïcha baisse les yeux, Lalla Zoubida s'étonne, l'enfant écoute");
+})();
 
 /* === bam/12-ch12.js === */
 addChap('bam',{
@@ -1563,6 +1936,23 @@ addChap('bam',{
   {t:"Réaction personnelle",s:"Selon vous, les épreuves font-elles grandir plus vite ? Répondez en 3 lignes en vous appuyant sur l'œuvre.",open:true,m:"Position + arguments + exemple. Ex. : Oui, les épreuves obligent à mûrir : pendant l'absence du père, Sidi Mohammed devient confident de sa mère et observateur lucide. Mais elles peuvent aussi blesser durablement, comme le montrent ses maladies. L'essentiel est l'entourage qui aide à les traverser."}
  ]
 });
+
+/* === bam/12-ch12.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('bam',11,0,S([B.salle({fenetre:false,tapis:true,tx:120}),'<rect x="150" y="50" width="70" height="100" fill="#5a4330"/><rect x="156" y="56" width="58" height="94" fill="#f6d7a7"/>',
+ P({x:185,y:200,h:135,expr:'joie',hairstyle:'turban',beard:'#3a2a1a',dress:'#f3ecdc',dress2:'#d8cdb6',arms:'tend',skin:'mat',tenu:'<rect x="24" y="4" width="16" height="22" rx="3" fill="#8a6d3b"/>'}),
+ P({x:80,y:205,h:120,expr:'pleur',hairstyle:'voile',veil:'#1f6f78',dress:'#2f6f78',arms:'leve'}),
+ P({x:130,y:212,h:70,expr:'joie',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'leve'}),
+ '<g fill="#d9a441"><polygon points="290,60 293,68 301,68 295,73 297,81 290,76 283,81 285,73 279,68 287,68"/><polygon points="40,80 42,85 47,85 43,88 44,93 40,90 36,93 37,88 33,85 38,85"/></g>',
+ p.titre('Le père est de retour',false)]),
+ "Un soir, le père apparaît dans la porte, bronzé et souriant ; la mère pleure de joie, l'enfant court vers lui");
+I.set('bam',11,4,S([B.salle({fenetre:false,tapis:false}),'<rect width="360" height="220" fill="#1b1410" opacity=".72"/>',p.bougie(300,140),
+ P({x:120,y:200,h:100,pose:'assis',expr:'serein',dress:'#f4f0e6',dress2:'#d8d2c4',arms:'tend',regard:2}),
+ '<g transform="translate(150,150) scale(1.4)">'+p.boite(0,0,true)+'</g>',
+ '<g fill="#fff8d6" opacity=".9"><circle cx="50" cy="30" r="1.5"/><circle cx="300" cy="25" r="2"/><circle cx="320" cy="110" r="1.5"/><circle cx="40" cy="120" r="1.5"/></g>',
+ p.legende('La boîte, ouverte comme au premier chapitre',true)]),
+ "Retour au point de départ : l'enfant et sa boîte, mais le visage, cette fois, est apaisé");
+})();
 
 /* === bam/90-ar.js === */
 addAr('bam',1,{tip:"ثاني أكثر الفصول وروداً في الامتحان: الكتّاب القرآني وأول خروج كبير إلى المدينة.",ep:[
@@ -1746,6 +2136,20 @@ addChap('ddc',{
  ]
 });
 
+/* === ddc/02-et02.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('ddc',1,1,S([B.cachot(),p.table(110,150,130),'<rect x="120" y="134" width="90" height="16" fill="#fff8e8" stroke="#c9b48e"/><g stroke="#8a6d3b" stroke-width="1"><line x1="126" y1="139" x2="200" y2="139"/><line x1="126" y1="144" x2="186" y2="144"/></g>',p.bougie(240,130),
+ P({x:90,y:205,h:120,pose:'assis',expr:'serein',hairstyle:'court',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'porte',skin:'clair',regard:4,tenu:'<line x1="10" y1="-6" x2="30" y2="-26" stroke="#2b2118" stroke-width="3" stroke-linecap="round"/>'}),
+ p.titre('« Puisque j’ai le moyen d’écrire, pourquoi ne le ferais-je pas ? »',true),p.legende('Un journal de souffrances, pour ceux qui condamnent',true)]),
+ "L'écriture : occuper le temps, témoigner, peut-être sauver d'autres têtes");
+I.set('ddc',1,3,S([B.salle({fenetre:true,fx:20,tapis:false}),'<rect width="360" height="220" fill="#2b1d12" opacity=".25"/>',
+ P({x:90,y:205,h:125,expr:'triste',hairstyle:'voile',veil:'#8a6d3b',hair:'#ddd',dress:'#6e5a4a',arms:'priere',skin:'clair'}),
+ P({x:190,y:205,h:125,expr:'pleur',hairstyle:'long',hair:'#3a2a1a',dress:'#9c4f7a',dress2:'#6e3a55',arms:'visage',skin:'clair'}),
+ P({x:285,y:210,h:65,expr:'joie',hairstyle:'long',hair:'#2b1d12',dress:'#d9a441',arms:'bas',skin:'clair'}),
+ p.nom(90,218,'la mère, 64 ans','#2b2118'),p.nom(190,218,'la femme','#2b2118'),p.nom(285,218,'Marie, 3 ans','#2b2118'),p.titre('Trois femmes qui n’ont que lui',false)]),
+ "La peine de mort frappe trois innocentes : la mère, l'épouse, et la petite Marie qui joue encore");
+})();
+
 /* === ddc/03-et03.js === */
 addChap('ddc',{
  titre:"Le cachot et les murs qui parlent (ch. 10-12)",
@@ -1782,6 +2186,14 @@ addChap('ddc',{
  ]
 });
 
+/* === ddc/03-et03.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('ddc',2,0,S([B.cachot(),'<g font-size="8" fill="#9a9385" font-style="italic" opacity=".9"><text x="30" y="60">DAUTUN</text><text x="40" y="76">POULAIN</text><text x="100" y="95">Castaing</text><text x="110" y="110">Papavoine</text><text x="40" y="130">BORIES</text><text x="150" y="60">1826</text></g><g transform="translate(60,100) scale(.35)">'+p.guillotine(0,0,1)+'</g>',
+ P({x:230,y:205,h:125,expr:'peur',hairstyle:'court',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'porte',skin:'clair',regard:-4,tenu:p.bougie(-6,-4)}),
+ p.legende('Pierre, paille, barreaux, et des murs couverts d’écritures',true)]),
+ "À la lueur de la lampe, le condamné lit les noms gravés par ceux qui l'ont précédé");
+})();
+
 /* === ddc/04-et04.js === */
 addChap('ddc',{
  titre:"Le ferrement des forçats (ch. 13-14)",
@@ -1815,6 +2227,17 @@ addChap('ddc',{
   {t:"Réaction personnelle",s:"Le condamné en vient à envier les forçats. Comprenez-vous ce sentiment ? 3 lignes.",open:true,m:"Position + arguments + exemple. Ex. : Oui, car tant qu'il y a la vie, il y a l'espoir d'un changement, d'un retour, d'un pardon ; la mort ferme tout. Ce sentiment montre que la peine de mort est pire que la pire des peines. Il invite à réfléchir sur la valeur absolue de la vie."}
  ]
 });
+
+/* === ddc/04-et04.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('ddc',3,0,S([B.exterieur({ciel:'#6b7a86',ciel2:'#9aa6ad',sol:'#6b6472',sol2:'#55505c',soleil:false}),
+ '<g stroke="#c9cfd6" stroke-width="1" opacity=".6"><line x1="30" y1="0" x2="20" y2="60"/><line x1="90" y1="10" x2="80" y2="70"/><line x1="150" y1="0" x2="140" y2="60"/><line x1="210" y1="15" x2="200" y2="75"/><line x1="270" y1="5" x2="260" y2="65"/><line x1="330" y1="20" x2="320" y2="80"/></g>',
+ P({x:60,y:205,h:105,expr:'colere',hairstyle:'chauve',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'leve',skin:'moyen'}),P({x:120,y:205,h:105,expr:'joie',hairstyle:'court',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'leve',skin:'mat'}),P({x:180,y:205,h:105,expr:'colere',hairstyle:'chauve',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'hanches',skin:'clair'}),P({x:240,y:205,h:105,expr:'joie',hairstyle:'court',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'leve',skin:'fonce'}),
+ '<g stroke="#3b3542" stroke-width="4" fill="none"><path d="M60 150 q30 14 60 0 q30 14 60 0 q30 14 60 0"/></g><g fill="none" stroke="#3b3542" stroke-width="3"><circle cx="60" cy="150" r="7"/><circle cx="120" cy="150" r="7"/><circle cx="180" cy="150" r="7"/><circle cx="240" cy="150" r="7"/></g>',
+ '<g transform="translate(300,40)"><rect x="0" y="0" width="50" height="50" fill="#3b3542"/>'+p.barreaux(8,0,34,50,2)+'<circle cx="25" cy="28" r="8" fill="#e3b58a"/><path d="M17 26 q8 -10 16 0Z" fill="#2b1d12"/></g>',
+ p.titre('La chaîne, sous la pluie glacée',false),p.legende('Colliers rivés à coups de marteau, chants et insultes',true)]),
+ "Depuis sa fenêtre grillagée, le condamné regarde les forçats enchaînés danser sous la pluie");
+})();
 
 /* === ddc/05-et05.js === */
 addChap('ddc',{
@@ -1852,6 +2275,16 @@ addChap('ddc',{
  ]
 });
 
+/* === ddc/05-et05.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('ddc',4,1,S([B.cachot(),'<rect x="150" y="30" width="60" height="50" fill="#9fb8bd"/>'+p.barreaux(160,30,40,50,2),
+ P({x:80,y:205,h:120,expr:'serein',yeuxFermes:true,hairstyle:'long',hair:'#2b1d12',dress:'#9c4f7a',dress2:'#6e3a55',arms:'bas',skin:'clair'}),
+ '<g fill="#f3e6c9" font-size="16" opacity=".8"><text x="110" y="90">♪</text><text x="128" y="70">♫</text><text x="100" y="60">♪</text></g>',
+ P({x:260,y:205,h:120,pose:'assis',expr:'surprise',hairstyle:'court',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'bas',skin:'clair',regard:-4}),
+ p.legende('Une voix de jeune fille chante l’histoire d’un voleur pendu',true)]),
+ "Une chanson douce sur des paroles atroces : le condamné écoute, glacé");
+})();
+
 /* === ddc/06-et06.js === */
 addChap('ddc',{
  titre:"Le pourvoi rejeté, le prêtre, le départ (ch. 19-22)",
@@ -1887,6 +2320,21 @@ addChap('ddc',{
   {t:"Réaction personnelle",s:"Les personnes qui accompagnent un condamné (directeur, prêtre, huissier) font « leur métier ». Peut-on leur reprocher leur indifférence ? 3 lignes.",open:true,m:"Position nuancée + arguments + exemple. Ex. : On peut comprendre qu'ils se protègent par la routine, car ils voient mourir des hommes chaque mois. Mais cette habitude est précisément ce que Hugo dénonce : une société qui s'habitue à tuer. Chacun reste responsable de garder un peu d'humanité dans sa fonction."}
  ]
 });
+
+/* === ddc/06-et06.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('ddc',5,0,S([B.cachot(),
+ P({x:90,y:205,h:132,expr:'serein',hairstyle:'blanc',dress:'#1b181f',dress2:'#000',arms:'porte',skin:'clair',tenu:'<rect x="-12" y="-8" width="26" height="18" fill="#fff8e8" stroke="#8a6d3b"/>'}),
+ P({x:250,y:205,h:125,expr:'peur',hairstyle:'court',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'bas',skin:'clair',flip:true}),
+ p.bulle(110,50,'Rejeté. Ce sera pour aujourd’hui.','#fff3e0'),p.nom(90,218,'le directeur','#f3e6c9'),p.nom(250,218,'le condamné','#f3e6c9')]),
+ "Le directeur annonce poliment la mort pour l'après-midi");
+I.set('ddc',5,2,S([B.rue({}),'<rect x="110" y="110" width="140" height="70" rx="5" fill="#2b2118"/><rect x="125" y="120" width="40" height="30" fill="#9fb8bd"/>'+p.barreaux(133,120,24,30,2)+'<circle cx="125" cy="188" r="12" fill="#555"/><circle cx="235" cy="188" r="12" fill="#555"/>',
+ '<g transform="translate(145,135)">'+I.face({r:9,skin:I.SK.clair,expr:'triste'})+'</g>',
+ '<g transform="translate(60,160)"><ellipse cx="0" cy="25" rx="18" ry="11" fill="#8a6d3b"/><circle cx="-14" cy="12" r="7" fill="#8a6d3b"/><rect x="-6" y="30" width="4" height="12" fill="#5a4330"/><rect x="8" y="30" width="4" height="12" fill="#5a4330"/></g>',
+ p.foule(260,120,5),P({x:320,y:208,h:70,expr:'joie',hairstyle:'long',dress:'#d9a441',skin:'clair'}),
+ '<g font-size="8" fill="#2b2118"><text x="20" y="200">Bicêtre →</text><text x="290" y="200">→ Conciergerie</text></g>',p.titre('Paris vivant derrière les barreaux de la voiture',false)]),
+ "Dans la voiture cellulaire, le condamné regarde une dernière fois la ville qui continue sans lui");
+})();
 
 /* === ddc/07-et07.js === */
 addChap('ddc',{
@@ -1924,6 +2372,20 @@ addChap('ddc',{
   {t:"Réaction personnelle",s:"Le friauche dit que la prison lui a appris à voler. La prison peut-elle vraiment rendre pire ? 3 lignes.",open:true,m:"Position + arguments + exemple. Ex. : Oui, si elle se contente d'enfermer : les détenus apprennent les uns des autres et sortent marqués, comme le friauche avec son passeport jaune. Une prison qui forme et réinsère peut au contraire aider. La société doit donc penser à l'après-peine autant qu'à la peine."}
  ]
 });
+
+/* === ddc/07-et07.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('ddc',6,0,S([B.cachot(),
+ P({x:100,y:205,h:125,expr:'triste',hairstyle:'court',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'tend',skin:'clair'}),
+ P({x:250,y:205,h:125,expr:'joie',hairstyle:'chauve',hair:'#555',beard:'#555',dress:'#7a6a58',dress2:'#5a4a3a',arms:'pointe',flip:true,skin:'mat',tenu:'<rect x="-30" y="-40" width="3" height="40" fill="#8a8494"/>'}),
+ '<rect x="150" y="90" width="60" height="30" rx="3" fill="#1f6f78"/><text x="180" y="135" text-anchor="middle" font-size="8" fill="#c9b48e">la redingote</text>',
+ p.bulle(250,50,'File-moi ta redingote !','#fff3e0'),p.nom(100,218,'le condamné','#f3e6c9'),p.nom(250,218,'le friauche','#f3e6c9')]),
+ "Le friauche, insolent et bavard, réclame la redingote du condamné");
+I.set('ddc',6,3,S([B.cachot(),p.table(90,150,150),'<g transform="translate(110,128) rotate(-3)"><rect x="0" y="0" width="100" height="22" fill="#fff8e8" stroke="#c9b48e"/><text x="6" y="10" font-size="7" font-style="italic" fill="#b5452c">Ma chère Marie,</text><g stroke="#8a6d3b" stroke-width="1"><line x1="6" y1="15" x2="90" y2="15"/><line x1="6" y1="19" x2="70" y2="19"/></g></g>',p.bougie(260,130),
+ P({x:70,y:205,h:120,pose:'assis',expr:'pleur',hairstyle:'court',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'porte',skin:'clair',regard:4}),
+ p.legende('Une lettre qu’elle lira quand elle saura lire',true)]),
+ "Il écrit à sa fille, en pleurant, ce qu'elle ne pourra comprendre que plus tard");
+})();
 
 /* === ddc/08-et08.js === */
 addChap('ddc',{
@@ -1964,6 +2426,20 @@ addChap('ddc',{
  ]
 });
 
+/* === ddc/08-et08.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('ddc',7,0,S([B.cachot(),'<g opacity=".55">'+p.guillotine(150,40,1)+'</g>',
+ P({x:70,y:205,h:120,pose:'assis',expr:'peur',hairstyle:'court',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'visage',skin:'clair'}),
+ '<g fill="#f3e6c9" opacity=".7"><text x="250" y="60" font-size="22">?</text><text x="285" y="100" font-size="16">?</text></g>',
+ p.titre('« Qu’est-ce que cela fait, de mourir ? »',true),p.legende('Il ne l’a jamais vue : il la reconstruit en pensée',true)]),
+ "Le condamné imagine la machine qu'il n'a jamais regardée");
+I.set('ddc',7,2,S([B.exterieur({ciel:'#f6e7c8',ciel2:'#fbf0dc',sol:'#7fb069',sol2:'#5e8f4f'}),'<g fill="#b5452c"><circle cx="40" cy="150" r="4"/><circle cx="80" cy="145" r="4"/><circle cx="290" cy="150" r="4"/><circle cx="320" cy="158" r="4"/></g><ellipse cx="60" cy="160" rx="50" ry="22" fill="#6a9a58"/><ellipse cx="300" cy="162" rx="55" ry="24" fill="#6a9a58"/>',
+ P({x:140,y:205,h:95,expr:'joie',hairstyle:'court',dress:'#1f6f78',arms:'porte',skin:'clair',tenu:p.livre(-8,-6)}),
+ P({x:210,y:205,h:92,expr:'joie',hairstyle:'long',hair:'#2b1d12',dress:'#9c4f7a',dress2:'#6e3a55',arms:'porte',flip:true,skin:'moyen'}),
+ p.titre('Un après-midi d’enfance, un jardin, un livre',false),p.legende('Pepa, la petite Andalouse',false)]),
+ "Le souvenir de Pepa : le seul rayon de soleil du roman");
+})();
+
 /* === ddc/09-et09.js === */
 addChap('ddc',{
  titre:"L'attente et la visite de Marie (ch. 38-47)",
@@ -2002,6 +2478,18 @@ addChap('ddc',{
  ]
 });
 
+/* === ddc/09-et09.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('ddc',8,1,S([B.cachot(),
+ P({x:100,y:205,h:130,pose:'genoux',expr:'pleur',hairstyle:'court',hair:'#2b1d12',beard:'#3a2a1a',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'tend',skin:'clair'}),
+ P({x:200,y:208,h:66,expr:'peur',hairstyle:'long',hair:'#2b1d12',dress:'#d9a441',arms:'porte',skin:'clair',regard:-3,tenu:p.lettre(-12,-8)}),
+ P({x:300,y:205,h:125,expr:'triste',hairstyle:'voile',veil:'#8a6d3b',hair:'#ddd',dress:'#6e5a4a',arms:'bas',flip:true,skin:'clair'}),
+ p.bulle(200,70,'Monsieur…','#fff8e8'),p.titre('Elle croit que son papa est mort',true),p.nom(100,218,'le père','#f3e6c9'),p.nom(200,218,'Marie','#f3e6c9'),p.nom(300,218,'la bonne','#f3e6c9')]),
+ "Marie ne reconnaît pas son père et l'appelle « monsieur » ; elle tient son arrêt de mort");
+I.set('ddc',8,3,S(['<rect width="360" height="220" fill="#fff8e8"/><text x="180" y="70" text-anchor="middle" font-size="16" font-weight="700" fill="#2b2118">XLVII</text><text x="180" y="96" text-anchor="middle" font-size="13" font-style="italic" fill="#2b2118">MON HISTOIRE</text><line x1="120" y1="110" x2="240" y2="110" stroke="#c9b48e"/><text x="180" y="150" text-anchor="middle" font-size="9" fill="#7a6a58">(Note de l’éditeur : les feuillets qui se rattachaient à celui-ci</text><text x="180" y="163" text-anchor="middle" font-size="9" fill="#7a6a58">n’ont pas été retrouvés.)</text>']),
+ "Un titre, une note d'éditeur, et rien : le crime restera inconnu");
+})();
+
 /* === ddc/10-et10.js === */
 addChap('ddc',{
  titre:"La toilette et la Grève (ch. 48-49)",
@@ -2039,6 +2527,24 @@ addChap('ddc',{
   {t:"Réaction personnelle",s:"Après avoir lu ce roman, votre position sur la peine de mort a-t-elle évolué ? Répondez en 4 lignes avec deux arguments.",open:true,m:"Position argumentée + nuance. Ex. : Le roman m'a convaincu que la peine de mort est d'abord une torture morale, bien avant l'exécution, et qu'elle frappe des innocents comme Marie. Cependant, Hugo évite le point de vue des victimes du crime, ce qui est la limite du roman à thèse. Ma position : la justice doit protéger sans tuer, car une erreur est irréparable."}
  ]
 });
+
+/* === ddc/10-et10.svg.js === */
+(function(){var P=I.person,p=I.p,S=I.scene,B=I.bg;
+I.set('ddc',9,0,S([B.cachot(),
+ P({x:180,y:205,h:125,pose:'assis',expr:'triste',hairstyle:'court',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'bas',skin:'clair',regard:0}),
+ P({x:80,y:205,h:130,expr:'severe',hairstyle:'court',hair:'#111',dress:'#1b181f',dress2:'#000',arms:'pointe',skin:'moyen',tenu:'<path d="M30 -16 l10 -4 l-2 8Z" fill="#c9cfd6"/><path d="M30 -16 l10 -4" stroke="#c9cfd6" stroke-width="3"/>'}),
+ P({x:290,y:205,h:130,expr:'neutre',hairstyle:'court',hair:'#111',dress:'#1b181f',dress2:'#000',arms:'pointe',flip:true,skin:'clair',tenu:'<path d="M-30 -10 q-10 6 -6 14" stroke="#8a8494" stroke-width="3" fill="none"/>'}),
+ '<g fill="#2b1d12" opacity=".6"><path d="M170 120 q10 -8 20 0"/><path d="M185 112 q6 -6 12 0"/></g>',
+ p.titre('On coupe les cheveux, on lie les mains',true),p.legende('Le bourreau et ses aides, gestes d’habitude',true)]),
+ "La toilette : cheveux coupés, col déchiré, mains liées, sous le regard d'un journaliste");
+I.set('ddc',9,1,S([B.rue({}),'<rect width="360" height="220" fill="#c9cfd6" opacity=".35"/>',
+ p.foule(10,70,6),p.foule(250,70,6),p.foule(30,150,4),p.foule(290,150,4),
+ '<g><rect x="130" y="130" width="100" height="36" fill="#8a6d3b"/><circle cx="150" cy="176" r="11" fill="#3b3542"/><circle cx="210" cy="176" r="11" fill="#3b3542"/><path d="M130 140 l-40 -20" stroke="#8a6d3b" stroke-width="4"/></g>',
+ P({x:180,y:135,h:80,expr:'peur',hairstyle:'court',dress:'#d8d2c4',dress2:'#b8b2a4',arms:'bas',skin:'clair'}),
+ '<g transform="translate(280,30) scale(.5)">'+p.guillotine(0,0,1)+'</g>',
+ p.titre('La Grève : fenêtres louées, cris, rires',false),p.legende('Une mer de têtes qui attend',false)]),
+ "Le trajet en charrette jusqu'à la place de Grève, sous les yeux d'une foule en fête");
+})();
 
 /* === ddc/90-ar.js === */
 addAr('ddc',1,{tip:"فصول التأمل: يشرح المحكوم مشروع كتابته ويصوغ أولى الحجج ضد عقوبة الإعدام.",ep:[
