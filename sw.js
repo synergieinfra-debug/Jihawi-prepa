@@ -1,6 +1,6 @@
 /* Service worker BAC Prép – cache "stale-while-revalidate".
    Changer VERSION à chaque nouvelle version du contenu pour forcer la mise à jour. */
-const VERSION = 'jihawi-e66ab8e7';
+const VERSION = 'jihawi-b1d10166';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
