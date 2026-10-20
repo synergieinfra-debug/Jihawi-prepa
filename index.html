@@ -68,7 +68,7 @@ nav button.on{color:var(--accent)}
 .admg{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}.admg .lab{display:block}.admg .inp{margin-top:2px}
 .adc,.adl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0;border-top:1px solid #eadfcf}.adc:first-child,.adl:first-child{border-top:0}
 .adc code,.adl code{font-size:1rem;font-weight:700;letter-spacing:.5px}.adl>div:first-child{flex:1;min-width:170px}.adl .acts{display:flex;gap:6px;flex-wrap:wrap}
-.adl .btn,.adc .btn{padding:6px 10px;font-size:.8rem;margin:0}.btn.wa{background:#25d366;color:#fff;text-decoration:none;display:inline-block}.btn.red{color:#b5452c;border-color:#b5452c}
+.adl .btn,.adc .btn{padding:6px 10px;font-size:.8rem;margin:0}.btn.wa{background:#25d366;color:#fff;text-decoration:none;display:inline-block}.btn.wa.w{display:block;text-align:center;padding:11px 14px;font-size:1rem;margin-top:10px}.btn.red{color:#b5452c;border-color:#b5452c}
 .st{font-size:.75rem;padding:2px 7px;border-radius:9px;background:#eee;color:#555;margin-left:4px}.st.on{background:#dff3e4;color:#1d6b3a}.st.off{background:#f9dcd6;color:#9b2f1a}
 .btn.ghost{background:none;color:var(--accent);border:1px solid var(--accent)}
 .btn.w{width:100%}
@@ -975,7 +975,7 @@ function initLicence(){
 function clearLicence(msg){S.lic=null;S.full=false;try{localStorage.removeItem('jp_paid');}catch(e){}store('lic',null);if(msg)alert(msg);location.reload();}
 function licCard(){
   if(S.full&&S.lic){return '<div class="card lic ok"><h2>Licence active ✓</h2><p>'+(S.lic.nom?'<b>'+esc(S.lic.nom)+'</b> · ':'')+'code <code>'+S.lic.code+'</code><br><span class="tip">Valable jusqu\'au '+new Date(S.lic.exp).toLocaleDateString('fr-MA')+' · '+'tous les chapitres et rédactions sont débloqués, hors ligne compris.</span></p></div>';}
-  return '<div class="card lic"><h2>Version démo</h2><p>Le chapitre 1 de chaque œuvre, les fiches, personnages, flashcards et la méthode sont gratuits. La version complète débloque les <b>'+countLocked()+' autres chapitres</b>, toutes les traductions arabes et les <b>20 rédactions modèles</b>.</p><button class="btn w" onclick="go(\'licence\')">J\'ai un code · Activer</button><p class="tip" style="margin-top:8px">Pour obtenir un code : WhatsApp <a href="https://wa.me/212661996001?text='+encodeURIComponent('Bonjour, je souhaite un code Jihawi Prépa.')+'">+212 661 996 001</a></p></div>';
+  return '<div class="card lic"><h2>Version démo</h2><p>Le chapitre 1 de chaque œuvre, les fiches, personnages, flashcards et la méthode sont gratuits. La version complète débloque les <b>'+countLocked()+' autres chapitres</b>, toutes les traductions arabes et les <b>20 rédactions modèles</b>.</p><button class="btn w" onclick="go(\'licence\')">J\'ai un code · Activer</button><a class="btn wa w" href="https://wa.me/212661996001?text='+encodeURIComponent('Bonjour, je souhaite un code d\'activation Jihawi Prépa (version complète).')+'" target="_blank" rel="noopener">💬 Demander un code sur WhatsApp</a><p class="tip" style="margin-top:6px;text-align:center">+212 661 996 001 · réponse rapide</p></div>';
 }
 function countLocked(){var n=0;Object.keys(BAM.oeuvres).forEach(function(id){n+=(BAM.oeuvres[id].locked||[]).length;});return n;}
 function renderLicence(m){
@@ -985,7 +985,7 @@ function renderLicence(m){
    +'<label class="lab">Code de licence</label><input id="licCode" class="inp" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" oninput="this.value=fmtCode(this.value)">'
    +'<label class="lab">Votre prénom (facultatif, affiché dans l\'app)</label><input id="licNom" class="inp" placeholder="ex. Yassine" maxlength="40">'
    +'<button class="btn w" id="licBtn" onclick="activate()">Activer</button><div id="licMsg" class="tip" style="margin-top:8px"></div></div>'
-   +'<div class="card"><h3 style="margin-top:0">Comment obtenir un code ?</h3><p>Écrivez-nous sur WhatsApp au <a href="https://wa.me/212661996001?text='+encodeURIComponent('Bonjour, je souhaite un code Jihawi Prépa.')+'">+212 661 996 001</a>. Le code est envoyé après paiement et reste valable toute l\'année scolaire.</p></div>';
+   +'<div class="card"><h3 style="margin-top:0">Comment obtenir un code ?</h3><p>Le code est envoyé sur WhatsApp après paiement et reste valable toute l\'année scolaire, sur 2 appareils.</p><a class="btn wa w" href="https://wa.me/212661996001?text='+encodeURIComponent('Bonjour, je souhaite un code d\'activation Jihawi Prépa (version complète).')+'" target="_blank" rel="noopener">💬 Demander un code sur WhatsApp</a><p class="tip" style="margin-top:6px;text-align:center">+212 661 996 001</p></div>';
 }
 function fmtCode(v){v=v.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);return v.replace(/(.{4})(?=.)/g,'$1-');}
 function activate(){
