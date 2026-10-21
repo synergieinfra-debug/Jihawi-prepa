@@ -65,7 +65,7 @@ nav button.on{color:var(--accent)}
 .btn.alt{background:var(--accent2)}
 .card.adm{border:1px dashed var(--accent)}
 .mat{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px;font-weight:700}.oeuvres .mat:first-child{margin-top:0}
-.admg .inp,#adQ{text-transform:none;letter-spacing:0;font-size:.95rem}
+.admg .inp,#adQ{text-transform:none;letter-spacing:0;font-size:.95rem}#licNom,#licTel{text-transform:none;letter-spacing:0;font-size:1rem}
 .admg{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}.admg .lab{display:block}.admg .inp{margin-top:2px}
 .adc,.adl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0;border-top:1px solid #eadfcf}.adc:first-child,.adl:first-child{border-top:0}
 .adc code,.adl code{font-size:1rem;font-weight:700;letter-spacing:.5px}.adl>div:first-child{flex:1;min-width:170px}.adl .acts{display:flex;gap:6px;flex-wrap:wrap}
@@ -2185,17 +2185,20 @@ function renderLicence(m){
   if(S.full){m.innerHTML=licCard()+'<div class="card"><button class="btn ghost w" onclick="if(confirm(\'Retirer la licence de cet appareil ?\'))clearLicence()">Retirer la licence de cet appareil</button></div>';return;}
   m.innerHTML='<div class="card"><h2>Activer la version complète</h2><p class="tip">Entrez le code reçu. Il est lié à cet appareil (2 appareils maximum par code). Connexion Internet nécessaire une seule fois : ensuite tout fonctionne hors ligne.</p>'
    +'<label class="lab">Code de licence</label><input id="licCode" class="inp" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" oninput="this.value=fmtCode(this.value)">'
-   +'<label class="lab">Votre prénom (facultatif, affiché dans l\'app)</label><input id="licNom" class="inp" placeholder="ex. Yassine" maxlength="40">'
+   +'<label class="lab">Votre nom et prénom</label><input id="licNom" class="inp" placeholder="ex. Yassine El Amrani" maxlength="40">'
+   +'<label class="lab">Votre numéro WhatsApp (celui qui a demandé le code)</label><input id="licTel" class="inp" placeholder="06 XX XX XX XX" inputmode="tel" maxlength="20">'
    +'<button class="btn w" id="licBtn" onclick="activate()">Activer</button><div id="licMsg" class="tip" style="margin-top:8px"></div></div>'
    +'<div class="card"><h3 style="margin-top:0">Comment obtenir un code ?</h3><p>Le code est envoyé sur WhatsApp après paiement et reste valable toute l\'année scolaire, sur 2 appareils.</p><a class="btn wa w" href="https://wa.me/212661996001?text='+encodeURIComponent('Bonjour, je souhaite un code d\'activation Jihawi Prépa (version complète).')+'" target="_blank" rel="noopener">💬 Demander un code sur WhatsApp</a><p class="tip" style="margin-top:6px;text-align:center">+212 661 996 001</p></div>';
 }
 function fmtCode(v){v=v.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);return v.replace(/(.{4})(?=.)/g,'$1-');}
 function activate(){
-  var code=($('licCode').value||'').trim(),nom=($('licNom').value||'').trim(),msg=$('licMsg'),btn=$('licBtn');
+  var code=($('licCode').value||'').trim(),nom=($('licNom').value||'').trim(),tel=($('licTel').value||'').trim(),msg=$('licMsg'),btn=$('licBtn');
   if(code.length!==14){msg.textContent='Le code doit comporter 12 caractères (XXXX-XXXX-XXXX).';return;}
+  if(!nom){msg.textContent='Indiquez votre nom et prénom.';return;}
+  if(!normTel(tel)){msg.textContent='Indiquez un numéro WhatsApp valide (ex. 0661996001).';return;}
   if(!navigator.onLine){msg.textContent='Connectez-vous à Internet pour activer (une seule fois).';return;}
   btn.disabled=true;msg.textContent='Vérification…';
-  fetch(API+'/activate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code:code,device:deviceId(),nom:nom})})
+  fetch(API+'/activate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code:code,device:deviceId(),nom:nom,tel:normTel(tel)})})
   .then(function(r){return r.json().then(function(j){return {s:r.status,j:j};});})
   .then(function(x){
     if(x.s!==200)throw new Error(x.j.error||'Activation refusée');
@@ -2260,7 +2263,7 @@ var _adAll=[];
 function adminList(){var el=$('adList');if(!el)return;el.textContent='Chargement…';
   admPost('/admin/list').then(function(j){if(!Array.isArray(j)){el.textContent='✗ '+(j.error||'Erreur');return;}_adAll=j;adminFilter();}).catch(function(){el.textContent='✗ Serveur injoignable';});}
 function adminFilter(){
-  var q=($('adQ').value||'').toLowerCase(),el=$('adList');var L=_adAll.filter(function(l){return !q||(l.code+' '+(l.nom||'')+' '+(l.lot||'')).toLowerCase().indexOf(q)>=0;});
+  var q=($('adQ').value||'').toLowerCase(),el=$('adList');var L=_adAll.filter(function(l){return !q||(l.code+' '+(l.nom||'')+' '+(l.tel||'')+' '+(l.nomEleve||'')+' '+(l.telEleve||'')+' '+(l.lot||'')).toLowerCase().indexOf(q)>=0;});
   var f=window._adF||'tous';L=L.filter(function(l){if(f==='impayes')return !l.paye&&(l.sentAt||l.active)&&!l.revoked;if(f==='actifs')return l.active&&!l.revoked;if(f==='off')return l.revoked;if(f==='libres')return !l.sentAt&&!l.active&&!l.revoked;return true;});
   var act=_adAll.filter(function(l){return l.active&&!l.revoked;}).length,imp=_adAll.filter(function(l){return !l.paye&&(l.sentAt||l.active)&&!l.revoked;}).length;$('adCount').textContent=_adAll.length+' codes · '+act+' actifs · '+imp+' impayé(s)';
   var chips=[['tous','Tous'],['impayes','Impayés'],['actifs','Actifs'],['libres','Non envoyés'],['off','Désactivés']].map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" onclick="_adF=\''+c[0]+'\';adminFilter()">'+c[1]+'</button>';}).join('');
@@ -2276,7 +2279,7 @@ function adminFilter(){
       +(l.active?'<button class="btn ghost" onclick="adminAct(\'reset\',\''+l.code+'\')">Libérer appareils</button>':'')
       +(l.revoked?'<button class="btn ghost" onclick="adminAct(\'unrevoke\',\''+l.code+'\')">Réactiver</button>':'<button class="btn ghost red" onclick="adminAct(\'revoke\',\''+l.code+'\')">Désactiver</button>');
     var sent=l.sentAt?' · envoyé le '+new Date(l.sentAt).toLocaleDateString('fr-MA'):'';var pay=l.revoked?'':(l.paye?' · <b style="color:#2b7a4b">payé</b>':' · <b style="color:#b5452c">non payé</b>');
-    return '<div class="adl"><div><code>'+l.code+'</code> '+etat+'<br><small>lot '+esc(l.lot||'—')+exp+sent+pay+'</small>'+(l.revoked?'<small>'+esc(l.nom||'—')+' · '+esc(l.tel||'—')+'</small>':assignInputs(l))+'</div><div class="acts">'+acts+'</div></div>';
+    return '<div class="adl"><div><code>'+l.code+'</code> '+etat+'<br><small>lot '+esc(l.lot||'—')+exp+sent+pay+'</small>'+(l.revoked?'<small>'+esc(l.nom||'—')+' · '+esc(l.tel||'—')+'</small>':assignInputs(l))+((l.telEleve&&l.telEleve!==l.tel)||(l.nomEleve&&l.nomEleve!==l.nom)?'<small>Déclaré à l\'activation : '+esc(l.nomEleve||'—')+' · '+esc(l.telEleve||'—')+'</small>':'')+'</div><div class="acts">'+acts+'</div></div>';
   }).join('');
 }
 function adminAct(a,code){
