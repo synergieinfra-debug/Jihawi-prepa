@@ -101,7 +101,7 @@ nav button.on{color:var(--accent)}
 .timer{font-variant-numeric:tabular-nums;font-weight:700;color:var(--accent)}
 .oeuvres{display:grid;gap:10px}
 .oeuvre{border-radius:14px;padding:14px;color:#fff;text-align:left;border:0;font-family:inherit;position:relative;overflow:hidden}
-.oeuvre b{display:block;font-size:1.05rem}
+.oeuvre{display:flex;align-items:center;gap:12px}.oeuvre .ico{flex:0 0 44px;width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center}.oeuvre .ico svg{width:28px;height:28px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.oeuvre .tx{flex:1 1 auto;min-width:0}.oeuvre .chev{flex:0 0 auto;font-size:1.5rem;opacity:.8;line-height:1}.oeuvre b{display:block;font-size:1.05rem}
 .oeuvre small{opacity:.85;font-size:.8rem}
 .oeuvre.soon{opacity:.55}
 .oeuvre .ribbon{position:absolute;top:10px;right:-28px;transform:rotate(35deg);background:var(--gold);color:#2b2118;font-size:.65rem;font-weight:700;padding:2px 34px}
@@ -2119,16 +2119,17 @@ var CONN_AR=['أولا','ثانيا','ثالثا','بداية','في البدا�
 function hiliteConn(t){var o=cur();if(o&&o.rtl){CONN_AR.forEach(function(c){var re=new RegExp('(^|[\\s(«])('+c+')(?=[\\s،,;:.!؟»)])','g');t=t.replace(re,'$1<mark class="conn">$2</mark>');});return t;}CONN.forEach(function(c){var re=new RegExp('(^|[\\s(«])('+c.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')(?=[\\s,;:.!?»)])','g');t=t.replace(re,'$1<mark class="conn">$2</mark>');});return t;}
 
 /* ---------- accueil ---------- */
-var MOD_META={bam:{t:'La Boîte à merveilles',a:'Ahmed Sefrioui · roman autobiographique',c:'linear-gradient(135deg,#b5452c,#d9a441)'},
-            antigone:{t:'Antigone',a:'Jean Anouilh · tragédie moderne',c:'linear-gradient(135deg,#1f6f78,#2b2118)'},
-            ddc:{t:'Le Dernier Jour d\'un condamné',a:'Victor Hugo · roman à thèse',c:'linear-gradient(135deg,#4a3b5c,#8a6d3b)'},
-            francais:{t:'Français',a:'Les trois œuvres au programme · l\'épreuve : analyse, langue, production écrite',c:'linear-gradient(135deg,#b5452c,#2b2118)'},
-            fr:{t:'Épreuve de français',a:'Référentiel · outils d\'analyse · langue · production écrite',c:'linear-gradient(135deg,#2b2118,#1f6f78)'},
-            ar:{t:'اللغة العربية',a:'الشعب العلمية والتقنية · النصوص، علوم اللغة، التعبير والإنشاء',c:'linear-gradient(135deg,#0f5e4a,#1f8a6a)',rtl:true},
-            hg:{t:'الاجتماعيات',a:'الشعب العلمية والتقنية · التاريخ والجغرافيا',c:'linear-gradient(135deg,#6b3f1d,#b5452c)',rtl:true},
-            is:{t:'التربية الإسلامية',a:'جميع الشعب · التزكية، الاقتداء، الاستجابة، القسط، الحكمة',c:'linear-gradient(135deg,#1f4f78,#2b7a8a)',rtl:true}};
-function modCard(id){var x=MOD_META[id];if(id==='francais'){return '<button class="oeuvre" style="background:'+x.c+'" onclick="go(\'francais\')"><b>'+x.t+'</b><small>'+x.a+'</small></button>';}var ok=!!BAM.oeuvres[id];
-    return '<button class="oeuvre'+(ok?'':' soon')+'" style="background:'+x.c+(x.rtl?';direction:rtl;text-align:right':'')+'" '+(ok?'onclick="openOeuvre(\''+id+'\')"':'disabled')+'><b>'+x.t+'</b><small>'+x.a+'</small>'+(ok?'':'<span class="ribbon">'+(x.rtl?'قريبا':'BIENTÔT')+'</span>')+'</button>';}
+var MOD_META={bam:{ic:'feather',t:'La Boîte à merveilles',a:'Ahmed Sefrioui · roman autobiographique',c:'linear-gradient(135deg,#b5452c,#d9a441)'},
+            antigone:{ic:'mask',t:'Antigone',a:'Jean Anouilh · tragédie moderne',c:'linear-gradient(135deg,#1f6f78,#2b2118)'},
+            ddc:{ic:'scale',t:'Le Dernier Jour d\'un condamné',a:'Victor Hugo · roman à thèse',c:'linear-gradient(135deg,#4a3b5c,#8a6d3b)'},
+            francais:{ic:'book',t:'Français',a:'Les trois œuvres au programme · l\'épreuve : analyse, langue, production écrite',c:'linear-gradient(135deg,#b5452c,#2b2118)'},
+            fr:{ic:'pencil',t:'Épreuve de français',a:'Référentiel · outils d\'analyse · langue · production écrite',c:'linear-gradient(135deg,#2b2118,#1f6f78)'},
+            ar:{ic:'pen',t:'اللغة العربية',a:'الشعب العلمية والتقنية · النصوص، علوم اللغة، التعبير والإنشاء',c:'linear-gradient(135deg,#0f5e4a,#1f8a6a)',rtl:true},
+            hg:{ic:'globe',t:'الاجتماعيات',a:'الشعب العلمية والتقنية · التاريخ والجغرافيا',c:'linear-gradient(135deg,#6b3f1d,#b5452c)',rtl:true},
+            is:{ic:'mosque',t:'التربية الإسلامية',a:'جميع الشعب · التزكية، الاقتداء، الاستجابة، القسط، الحكمة',c:'linear-gradient(135deg,#1f4f78,#2b7a8a)',rtl:true}};
+var MOD_ICO={"book": "<svg viewBox=\"0 0 24 24\"><path d=\"M12 6c-1.5-1.3-3.5-2-6-2H3v14h3c2.5 0 4.5.7 6 2 1.5-1.3 3.5-2 6-2h3V4h-3c-2.5 0-4.5.7-6 2zM12 6v14\"/></svg>", "pen": "<svg viewBox=\"0 0 24 24\"><path d=\"M14 3l7 7-9.5 9.5L4 21l1.5-7.5L14 3zM12.5 8.5l3 3M4 21l5-5\"/><circle cx=\"11\" cy=\"13\" r=\"1.2\"/></svg>", "globe": "<svg viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18M5 7.5h14M5 16.5h14\"/></svg>", "mosque": "<svg viewBox="0 0 24 24"><path d="M2 21h20M5 21v-8h14v8M5 13c0-3.5 3.5-5.5 7-8.5 3.5 3 7 5 7 8.5M12 4.5V2.5M20.5 13V8l1-2.5L22.5 8v13M1.5 21V8l1-2.5L3.5 8v5M10 21v-4.5h4V21"/></svg>"0 0 24 24\"><path d=\"M3 21h18M5 21v-7h14v7M5 14c0-3 3-4.5 7-7 4 2.5 7 4 7 7M12 7V4M11 4h2M4 21v-10M20 21v-10M3.5 11h1M19.5 11h1M9 21v-4h6v4\"/></svg>", "feather": "<svg viewBox=\"0 0 24 24\"><path d=\"M20 4c-6 0-11 4-13 10l-3 6 6-3c6-2 10-7 10-13zM4 20l9-9M9 15h4\"/></svg>", "mask": "<svg viewBox=\"0 0 24 24\"><path d=\"M4 5h16v7c0 4-3.5 7-8 7s-8-3-8-7V5z\"/><path d=\"M8 10c.7-.8 1.8-.8 2.5 0M13.5 10c.7-.8 1.8-.8 2.5 0M8.5 14c2 1.5 5 1.5 7 0\"/></svg>", "scale": "<svg viewBox=\"0 0 24 24\"><path d=\"M12 3v18M5 21h14M12 6l-6 2 6-2 6 2M6 8l-3 7h6l-3-7zM18 8l-3 7h6l-3-7z\"/></svg>", "pencil": "<svg viewBox=\"0 0 24 24\"><path d=\"M4 20l4-1L19 8l-3-3L5 16l-1 4zM14 7l3 3M4 20h16\"/></svg>"};
+function modCard(id){var x=MOD_META[id];var ico='<span class="ico">'+(MOD_ICO[x.ic]||MOD_ICO.book)+'</span>';if(id==='francais'){return '<button class="oeuvre" style="background:'+x.c+'" onclick="go(\'francais\')">'+ico+'<span class="tx"><b>'+x.t+'</b><small>'+x.a+'</small></span><span class="chev">›</span></button>';}var ok=!!BAM.oeuvres[id];
+    return '<button class="oeuvre'+(ok?'':' soon')+'" style="background:'+x.c+(x.rtl?';direction:rtl;text-align:right':'')+'" '+(ok?'onclick="openOeuvre(\''+id+'\')"':'disabled')+'>'+ico+'<span class="tx"><b>'+x.t+'</b><small>'+x.a+'</small></span><span class="chev">'+(x.rtl?'‹':'›')+'</span>'+(ok?'':'<span class="ribbon">'+(x.rtl?'قريبا':'BIENTÔT')+'</span>')+'</button>';}
 function renderFrancais(m){
   setTitle('Français','1ʳᵉ année bac · Examen régional');
   var h='<div class="card"><h2>Français</h2><p class="tip">L\'examen régional porte sur les trois œuvres au programme (étude de texte) et sur l\'épreuve elle-même : outils d\'analyse, langue et production écrite.</p><div class="oeuvres">';
