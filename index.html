@@ -152,6 +152,7 @@ body.rtl button.back{transform:scaleX(-1)}body.rtl .keypoints,body.rtl .tip,body
 body.rtl .chapbtn .st{text-align:left}body.rtl .para .lab{margin:0 0 0 8px}body.rtl .redac button .ch{transform:rotate(180deg)}
 body.rtl table th,body.rtl table td{text-align:right}body.rtl .inp{text-transform:none;letter-spacing:0}
 body.rtl .caption{font-size:.85rem}
+body.rtl .opt,body.rtl .btn,body.rtl textarea,body.rtl .stem,body.rtl .q,body.rtl .redac button,body.rtl .chapbtn .t{text-align:right}body.rtl .btn.w,body.rtl .seg button,body.rtl .flash,body.rtl .selfeval button{text-align:center}.opt .ol{font-weight:700;color:var(--accent2)}
 body.rtl .keypoints,body.rtl .expl,body.rtl .redac .sujet{border-left:0;border-right:4px solid var(--gold)}body.rtl .expl{border-right-color:var(--accent2)}body.rtl .q .tag{letter-spacing:0}
 </style>
 </head>
@@ -1408,7 +1409,7 @@ function renderQuiz(list,mode){
     if(q.open){
       h+='<textarea placeholder="'+T('placeholder')+'"></textarea><button class="btn alt" onclick="showModel('+i+')">'+T('voirCorrige')+'</button><div class="expl" id="ex'+i+'"><b>'+T('corrige')+'</b><br>'+q.m+'<div class="selfeval"><button onclick="selfEval('+i+',0,this)">'+T('nonAcquis')+'</button><button onclick="selfEval('+i+',0.5,this)">'+T('partiel')+'</button><button onclick="selfEval('+i+',1,this)">'+T('acquis')+'</button></div></div>';
     }else{
-      q.o.forEach(function(o,j){h+='<button class="opt" id="o'+i+'_'+j+'" onclick="answer('+i+','+j+')">'+String.fromCharCode(65+j)+'. '+o+'</button>';});
+      q.o.forEach(function(o,j){h+='<button class="opt" id="o'+i+'_'+j+'" onclick="answer('+i+','+j+')"><span class="ol">'+(cur()&&cur().rtl?(j+1)+' ·':String.fromCharCode(65+j)+'.')+'</span> '+o+'</button>';});
       h+='<div class="expl" id="ex'+i+'"><b>'+T('explication')+'</b> '+q.e+'</div>';
     }
     d.innerHTML=h;box.appendChild(d);
