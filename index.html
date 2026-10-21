@@ -1020,7 +1020,7 @@ function adminLogin(){
 function adminLogout(){if(confirm('Retirer l\'accès administrateur de cet appareil ?')){store('adm',null);S.hist=[];go('home',null,true);}}
 function appUrl(){return location.origin+location.pathname.replace(/index\.html$/,'');}
 function waMsg(code,nom){return 'Bonjour'+(nom?' '+nom:'')+' 👋\nVoici votre code *Jihawi Prépa* (Français 1ʳᵉ bac) :\n\n*'+code+'*\n\n1) Ouvrez '+appUrl()+'\n2) Touchez « J\'ai un code · Activer », saisissez le code et votre prénom.\n3) Installez l\'application (menu ⋮ → Ajouter à l\'écran d\'accueil) : elle fonctionne ensuite hors connexion.\n\nValable toute l\'année scolaire, sur 2 appareils maximum. Bonne révision !';}
-function waLink(code,nom){return 'https://wa.me/?text='+encodeURIComponent(waMsg(code,nom));}
+function waLink(code,nom){var t=encodeURIComponent(waMsg(code,nom));if(/Android/i.test(navigator.userAgent))return 'intent://send?text='+t+'#Intent;scheme=whatsapp;package=com.whatsapp;S.browser_fallback_url='+encodeURIComponent('https://wa.me/?text='+t)+';end';return 'https://wa.me/?text='+t;}
 function copyTxt(t,btn){var done=function(){if(btn){var o=btn.textContent;btn.textContent='Copié ✓';setTimeout(function(){btn.textContent=o;},1200);}};
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){prompt('Copiez :',t);});else prompt('Copiez :',t);}
 function renderAdmin(m){
