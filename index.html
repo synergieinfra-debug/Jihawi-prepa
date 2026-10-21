@@ -344,8 +344,10 @@ var I=(function(){
     return D.svg(h,parts);},
   // carte schématique du Maroc (silhouette simplifiée, 360x220) avec points nommés : pts [{x,y,l,c}]
   maroc:function(pts,titre,extra){var path='M178 18 L200 24 L232 30 L254 38 L262 60 L248 84 L236 108 L222 128 L206 150 L186 168 L160 186 L130 204 L96 214 L70 216 L66 198 L74 176 L84 158 L96 142 L108 126 L116 110 L124 96 L132 86 L144 72 L154 60 L162 48 L172 30 Z';
-    var parts=[titre?D.pill(80,4,200,24,titre):'','<path d="'+path+'" fill="#e9dcc0" stroke="#8a6d3b" stroke-width="2"/>','<path d="M70 216 L66 198 L74 176 L84 158 L96 142 L108 126" stroke="#1f6f78" stroke-width="3" fill="none" opacity=".5"/>'].concat(extra||[]);
-    (pts||[]).forEach(function(p){parts.push('<circle cx="'+p.x+'" cy="'+p.y+'" r="'+(p.r||4)+'" fill="'+(p.c||'#b5452c')+'" stroke="#fff" stroke-width="1.5"/><text x="'+(p.x+(p.dx||8))+'" y="'+(p.y+(p.dy||4))+'" font-size="8.5" font-weight="700" fill="#2b2118" text-anchor="'+(p.a||'start')+'">'+p.l+'</text>');});
+    var parts=['<path d="'+path+'" fill="#e9dcc0" stroke="#8a6d3b" stroke-width="2"/>','<path d="M70 216 L66 198 L74 176 L84 158 L96 142 L108 126" stroke="#1f6f78" stroke-width="3" fill="none" opacity=".5"/>'].concat(extra||[]);
+    // en RTL, text-anchor=start ancre le bord DROIT : étiquette à gauche du point par défaut, à droite avec a:'end'
+    (pts||[]).forEach(function(p){var a=p.a||'start',dx=p.dx!==undefined?p.dx:(a==='end'?8:-8);parts.push('<circle cx="'+p.x+'" cy="'+p.y+'" r="'+(p.r||4)+'" fill="'+(p.c||'#b5452c')+'" stroke="#fff" stroke-width="1.5"/><text x="'+(p.x+dx)+'" y="'+(p.y+(p.dy||4))+'" font-size="8.5" font-weight="700" fill="#2b2118" text-anchor="'+a+'">'+p.l+'</text>');});
+    if(titre)parts.push(D.pill(50,4,260,26,titre));
     return D.svg(224,parts);},
   planRedaction:function(){return D.svg(150,[D.box(8,30,96,78,'#1f6f78','INTRODUCTION',['thème + question','annonce du plan']),D.box(122,30,116,78,'#b5452c','DÉVELOPPEMENT',['2 ou 3 arguments','+ exemples (œuvre, vie)']),D.box(256,30,96,78,'#d9a441','CONCLUSION',['bilan + avis','+ ouverture'],null,true),D.fleche('M104 69 H118'),D.fleche('M238 69 H252'),D.bandeau(118,'Un paragraphe par partie · un connecteur en tête de chaque paragraphe')]);}
  };
@@ -1489,6 +1491,12 @@ addChap('hg',{
 });
 })();
 
+addLocked("hg",{"titre":"المجال المغربي : الموارد الطبيعية والبشرية","sous":"الدرس 2 · تشخيص الموارد · الإكراهات · أساليب التدبير والاستراتيجيات","list":"langue"});
+addLocked("hg",{"titre":"التنافس الإمبريالي واندلاع الحرب العالمية الأولى","sous":"الدرس 2 · عوامل الإمبريالية ووسائلها · الأحلاف والأزمات · الحرب 1914-1918 ونتائجها"});
+addLocked("hg",{"titre":"الاختيارات الكبرى لسياسة إعداد التراب الوطني","sous":"الدرس 3 · المفهوم والمبادئ · التوجهات والمجالات ذات الأولوية · الأدوات والحصيلة","list":"langue"});
+addLocked("hg",{"titre":"اليقظة الفكرية بالمشرق العربي","sous":"الدرس 3 · العوامل · التيار السلفي والتيار العلماني · القضايا والنتائج"});
+addLocked("hg",{"titre":"التهيئة الحضرية والريفية : أزمة المدينة والريف وأشكال التدخل","sous":"الدرس 4 · مظاهر الأزمتين · العوامل المفسرة · السياسات والبرامج","list":"langue"});
+addLocked("hg",{"titre":"الضغوط الاستعمارية على المغرب ومحاولات الإصلاح","sous":"الدرس 4 · الضغوط العسكرية والديبلوماسية والاقتصادية · إصلاحات القرن 19 وحدودها · الطريق إلى 1912"});
 /* === hg/94-maqalat-demo.js === */
 /* مواضيع مقالية نموذجية (مجانية) : موضوع في التاريخ وموضوع في الجغرافيا */
 addRedac('hg',[
@@ -1517,7 +1525,7 @@ addRedac('hg',[
 </script>
 <script>
 /* ===================== MOTEUR ===================== */
-var API='https://jihawi-api.synergieinfra.workers.dev',FREE_CH=1,PAID_V='d1e999b7';
+var API='https://jihawi-api.synergieinfra.workers.dev',FREE_CH=1,PAID_V='bf35eb83';
 var S={oeuvre:null,view:'home',chap:null,list:'chapitres',hist:[],answers:{},exam:null,full:false,lic:null};
 var $=function(id){return document.getElementById(id)};
 function store(k,v){try{localStorage.setItem('bp_'+k,JSON.stringify(v));}catch(e){}}

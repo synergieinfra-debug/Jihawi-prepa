@@ -1,7 +1,7 @@
 /* Service worker Jihawi Prépa.
    Pages HTML : réseau d'abord (toujours la dernière version), cache seulement hors ligne.
    Autres fichiers (icônes, manifeste) : cache d'abord. VERSION est remplacée à chaque build. */
-const VERSION = 'jihawi-58abd690';
+const VERSION = 'jihawi-35404fb6';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
