@@ -1240,7 +1240,7 @@ addAr('ddc',0,{tip:"أشهر استهلال في المقرر. يرد كل سن�
 </script>
 <script>
 /* ===================== MOTEUR ===================== */
-var API='https://jihawi-api.synergieinfra.workers.dev',FREE_CH=1;
+var API='https://jihawi-api.synergieinfra.workers.dev',FREE_CH=1,PAID_V='d1e999b7';
 var S={oeuvre:null,view:'home',chap:null,list:'chapitres',hist:[],answers:{},exam:null,full:false,lic:null};
 var $=function(id){return document.getElementById(id)};
 function store(k,v){try{localStorage.setItem('bp_'+k,JSON.stringify(v));}catch(e){}}
@@ -1336,6 +1336,15 @@ function initLicence(){
   if(BAM.preview){S.full=true;S.lic={code:'APERCU-COMPLET',nom:'Aperçu de validation',exp:Date.now()+30*86400000};return;}
   S.lic=load('lic',null);var src=null;try{src=localStorage.getItem('jp_paid');}catch(e){}
   if(S.lic&&src){if(!loadPaid(src)){S.lic=null;}}else{S.lic=null;}
+  // contenu payant plus récent que la copie locale (nouveau module, corrections) : on le récupère en arrière-plan
+  if(S.lic&&navigator.onLine&&load('paidV',null)!==PAID_V&&S.lic.token){
+    fetch(API+'/content?tok='+encodeURIComponent(S.lic.token)).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(nsrc){
+      try{new Function(nsrc);}catch(e){return;}
+      try{localStorage.setItem('jp_paid',nsrc);}catch(e){return;}
+      store('paidV',PAID_V);
+      var t=$('toast');if(t){t.querySelector('span').textContent=(cur()&&cur().rtl)?'محتوى جديد متاح.':'Nouveau contenu disponible.';t.classList.add('show');}
+    }).catch(function(){});
+  }
   if(S.lic&&navigator.onLine&&Date.now()-(S.lic.checked||0)>7*86400000){
     fetch(API+'/check?tok='+encodeURIComponent(S.lic.token)).then(function(r){return r.json();}).then(function(j){
       if(j&&j.ok){S.lic.checked=Date.now();S.lic.exp=j.exp;store('lic',S.lic);}
@@ -1372,6 +1381,7 @@ function activate(){
     return fetch(API+'/content?tok='+encodeURIComponent(x.j.token)).then(function(r){if(!r.ok)throw new Error('Téléchargement impossible ('+r.status+')');return r.text();}).then(function(src){
       if(!loadPaid(src))throw new Error('Contenu invalide');
       try{localStorage.setItem('jp_paid',src);}catch(e){throw new Error('Mémoire du téléphone insuffisante');}
+      store('paidV',PAID_V);
       S.lic={code:code,nom:x.j.nom||nom,exp:x.j.exp,token:x.j.token,checked:Date.now()};store('lic',S.lic);
       msg.textContent='Activation réussie !';setTimeout(function(){S.hist=[];go('home',null,true);},600);
     });
