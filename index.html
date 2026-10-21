@@ -2232,7 +2232,7 @@ function adminSend(code,el){var box=el.closest('.adc,.adl'),nom=box.querySelecto
   if(tel&&!normTel(tel)){alert('Numéro WhatsApp invalide (ex. 0661996001)');return;}
   admPost('/admin/assign',{code:code,nom:nom,tel:normTel(tel),sent:true}).then(function(){adminList();}).catch(function(){});
   window.open(waLink(code,nom,tel),'_blank');}
-function adminPaye(code,v){admPost('/admin/assign',{code:code,paye:v}).then(function(j){if(j.ok)adminList();else alert(j.error||'Erreur');}).catch(function(){alert('Serveur injoignable');});}
+function adminPaye(code,v){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();admPost('/admin/assign',{code:code,paye:v}).then(function(j){if(j.ok)adminList();else alert(j.error||'Erreur');}).catch(function(){alert('Serveur injoignable');});}
 function assignInputs(l){return '<div class="asg"><input class="inp anom" placeholder="Nom de l\'élève" value="'+esc(l.nom||'')+'" maxlength="60"><input class="inp atel" placeholder="WhatsApp (06…)" inputmode="tel" value="'+esc(l.tel||'')+'" maxlength="20"></div>';}
 function copyTxt(t,btn){var done=function(){if(btn){var o=btn.textContent;btn.textContent='Copié ✓';setTimeout(function(){btn.textContent=o;},1200);}};
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){prompt('Copiez :',t);});else prompt('Copiez :',t);}
@@ -2260,18 +2260,17 @@ function adminGen(){
   }).catch(function(){btn.disabled=false;msg.textContent='✗ Serveur injoignable';});
 }
 var _adAll=[];
-function adminList(){var el=$('adList');if(!el)return;var y=window.scrollY;if(!_adAll.length)el.textContent='Chargement…';else el.style.opacity='.5';
-  admPost('/admin/list').then(function(j){el.style.opacity='';if(!Array.isArray(j)){el.textContent='✗ '+(j.error||'Erreur');return;}_adAll=j;adminFilter();window.scrollTo(0,y);}).catch(function(){el.style.opacity='';el.textContent='✗ Serveur injoignable';});}
+function adminList(){var el=$('adList');if(!el)return;if(!_adAll.length)el.textContent='Chargement…';
+  admPost('/admin/list').then(function(j){if(!Array.isArray(j)){el.textContent='✗ '+(j.error||'Erreur');return;}_adAll=j;adminFilter();}).catch(function(){if(!_adAll.length)el.textContent='✗ Serveur injoignable';});}
 function adminFilter(){
   var q=($('adQ').value||'').toLowerCase(),el=$('adList');var L=_adAll.filter(function(l){return !q||(l.code+' '+(l.nom||'')+' '+(l.tel||'')+' '+(l.nomEleve||'')+' '+(l.telEleve||'')+' '+(l.lot||'')).toLowerCase().indexOf(q)>=0;});
   var f=window._adF||'tous';L=L.filter(function(l){if(f==='impayes')return !l.paye&&(l.sentAt||l.active)&&!l.revoked;if(f==='actifs')return l.active&&!l.revoked;if(f==='off')return l.revoked;if(f==='libres')return !l.sentAt&&!l.active&&!l.revoked;return true;});
   var act=_adAll.filter(function(l){return l.active&&!l.revoked;}).length,imp=_adAll.filter(function(l){return !l.paye&&(l.sentAt||l.active)&&!l.revoked;}).length;$('adCount').textContent=_adAll.length+' codes · '+act+' actifs · '+imp+' impayé(s)';
   var chips=[['tous','Tous'],['impayes','Impayés'],['actifs','Actifs'],['libres','Non envoyés'],['off','Désactivés']].map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" onclick="_adF=\''+c[0]+'\';adminFilter()">'+c[1]+'</button>';}).join('');
   var fe=$('adChips');if(fe)fe.innerHTML=chips;
-  var y=window.scrollY;el.style.minHeight=el.offsetHeight+'px';
-  if(!L.length){el.innerHTML='Aucun code.';el.style.minHeight='';return;}
+  if(!L.length){el.innerHTML='Aucun code.';return;}
   L.sort(function(a,b){return (b.created||0)-(a.created||0);});
-  el.innerHTML=L.map(function(l){
+  var rows=L.map(function(l){
     var etat=l.revoked?'<span class="st off">désactivé</span>':l.active?'<span class="st on">actif · '+l.appareils+'/'+l.max+'</span>':'<span class="st">non utilisé</span>';
     var exp=l.exp?' · exp. '+new Date(l.exp).toLocaleDateString('fr-MA'):'';
     var paye=l.revoked?'':(l.paye?'<button class="btn ghost" onclick="adminPaye(\''+l.code+'\',false)" title="Marquer non payé">Payé ✓</button>':'<button class="btn ghost red" onclick="adminPaye(\''+l.code+'\',true)">Non payé → marquer payé</button>');
@@ -2280,10 +2279,14 @@ function adminFilter(){
       +(l.active?'<button class="btn ghost" onclick="adminAct(\'reset\',\''+l.code+'\')">Libérer appareils</button>':'')
       +(l.revoked?'<button class="btn ghost" onclick="adminAct(\'unrevoke\',\''+l.code+'\')">Réactiver</button>':'<button class="btn ghost red" onclick="adminAct(\'revoke\',\''+l.code+'\')">Désactiver</button>');
     var sent=l.sentAt?' · envoyé le '+new Date(l.sentAt).toLocaleDateString('fr-MA'):'';var pay=l.revoked?'':(l.paye?' · <b style="color:#2b7a4b">payé</b>':' · <b style="color:#b5452c">non payé</b>');
-    return '<div class="adl"><div><code>'+l.code+'</code> '+etat+'<br><small>lot '+esc(l.lot||'—')+exp+sent+pay+'</small>'+(l.revoked?'<small>'+esc(l.nom||'—')+' · '+esc(l.tel||'—')+'</small>':assignInputs(l))+((l.telEleve&&l.telEleve!==l.tel)||(l.nomEleve&&l.nomEleve!==l.nom)?'<small>Déclaré à l\'activation : '+esc(l.nomEleve||'—')+' · '+esc(l.telEleve||'—')+'</small>':'')+'</div><div class="acts">'+acts+'</div></div>';
-  }).join('');requestAnimationFrame(function(){el.style.minHeight='';window.scrollTo(0,y);});
+    return '<div class="adl" data-code="'+l.code+'"><div><code>'+l.code+'</code> '+etat+'<br><small>lot '+esc(l.lot||'—')+exp+sent+pay+'</small>'+(l.revoked?'<small>'+esc(l.nom||'—')+' · '+esc(l.tel||'—')+'</small>':assignInputs(l))+((l.telEleve&&l.telEleve!==l.tel)||(l.nomEleve&&l.nomEleve!==l.nom)?'<small>Déclaré à l\'activation : '+esc(l.nomEleve||'—')+' · '+esc(l.telEleve||'—')+'</small>':'')+'</div><div class="acts">'+acts+'</div></div>';
+  });
+  /* mise à jour ligne par ligne : la page ne bouge pas */
+  var cur=el.querySelectorAll('.adl');var same=cur.length===rows.length;if(same){for(var i=0;i<cur.length;i++){if(cur[i].getAttribute('data-code')!==L[i].code){same=false;break;}}}
+  if(same){var tmp=document.createElement('div');for(var k=0;k<rows.length;k++){tmp.innerHTML=rows[k];var nv=tmp.firstChild;if(cur[k].innerHTML!==nv.innerHTML){var f=document.activeElement,keep=f&&cur[k].contains(f)&&f.classList&&(f.classList.contains('anom')||f.classList.contains('atel'));if(keep)return;cur[k].innerHTML=nv.innerHTML;}}}
+  else el.innerHTML=rows.join('');
 }
-function adminAct(a,code){
+function adminAct(a,code){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
   var lib={reset:'Libérer les appareils de',revoke:'Désactiver',unrevoke:'Réactiver'}[a];if(!confirm(lib+' le code '+code+' ?'))return;
   admPost('/admin/'+a,{code:code}).then(function(j){if(j.ok)adminList();else alert(j.error||'Erreur');}).catch(function(){alert('Serveur injoignable');});
 }
