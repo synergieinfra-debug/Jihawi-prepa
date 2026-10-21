@@ -2260,15 +2260,16 @@ function adminGen(){
   }).catch(function(){btn.disabled=false;msg.textContent='✗ Serveur injoignable';});
 }
 var _adAll=[];
-function adminList(){var el=$('adList');if(!el)return;el.textContent='Chargement…';
-  admPost('/admin/list').then(function(j){if(!Array.isArray(j)){el.textContent='✗ '+(j.error||'Erreur');return;}_adAll=j;adminFilter();}).catch(function(){el.textContent='✗ Serveur injoignable';});}
+function adminList(){var el=$('adList');if(!el)return;var y=window.scrollY;if(!_adAll.length)el.textContent='Chargement…';else el.style.opacity='.5';
+  admPost('/admin/list').then(function(j){el.style.opacity='';if(!Array.isArray(j)){el.textContent='✗ '+(j.error||'Erreur');return;}_adAll=j;adminFilter();window.scrollTo(0,y);}).catch(function(){el.style.opacity='';el.textContent='✗ Serveur injoignable';});}
 function adminFilter(){
   var q=($('adQ').value||'').toLowerCase(),el=$('adList');var L=_adAll.filter(function(l){return !q||(l.code+' '+(l.nom||'')+' '+(l.tel||'')+' '+(l.nomEleve||'')+' '+(l.telEleve||'')+' '+(l.lot||'')).toLowerCase().indexOf(q)>=0;});
   var f=window._adF||'tous';L=L.filter(function(l){if(f==='impayes')return !l.paye&&(l.sentAt||l.active)&&!l.revoked;if(f==='actifs')return l.active&&!l.revoked;if(f==='off')return l.revoked;if(f==='libres')return !l.sentAt&&!l.active&&!l.revoked;return true;});
   var act=_adAll.filter(function(l){return l.active&&!l.revoked;}).length,imp=_adAll.filter(function(l){return !l.paye&&(l.sentAt||l.active)&&!l.revoked;}).length;$('adCount').textContent=_adAll.length+' codes · '+act+' actifs · '+imp+' impayé(s)';
   var chips=[['tous','Tous'],['impayes','Impayés'],['actifs','Actifs'],['libres','Non envoyés'],['off','Désactivés']].map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" onclick="_adF=\''+c[0]+'\';adminFilter()">'+c[1]+'</button>';}).join('');
   var fe=$('adChips');if(fe)fe.innerHTML=chips;
-  if(!L.length){el.innerHTML='Aucun code.';return;}
+  var y=window.scrollY;el.style.minHeight=el.offsetHeight+'px';
+  if(!L.length){el.innerHTML='Aucun code.';el.style.minHeight='';return;}
   L.sort(function(a,b){return (b.created||0)-(a.created||0);});
   el.innerHTML=L.map(function(l){
     var etat=l.revoked?'<span class="st off">désactivé</span>':l.active?'<span class="st on">actif · '+l.appareils+'/'+l.max+'</span>':'<span class="st">non utilisé</span>';
@@ -2280,7 +2281,7 @@ function adminFilter(){
       +(l.revoked?'<button class="btn ghost" onclick="adminAct(\'unrevoke\',\''+l.code+'\')">Réactiver</button>':'<button class="btn ghost red" onclick="adminAct(\'revoke\',\''+l.code+'\')">Désactiver</button>');
     var sent=l.sentAt?' · envoyé le '+new Date(l.sentAt).toLocaleDateString('fr-MA'):'';var pay=l.revoked?'':(l.paye?' · <b style="color:#2b7a4b">payé</b>':' · <b style="color:#b5452c">non payé</b>');
     return '<div class="adl"><div><code>'+l.code+'</code> '+etat+'<br><small>lot '+esc(l.lot||'—')+exp+sent+pay+'</small>'+(l.revoked?'<small>'+esc(l.nom||'—')+' · '+esc(l.tel||'—')+'</small>':assignInputs(l))+((l.telEleve&&l.telEleve!==l.tel)||(l.nomEleve&&l.nomEleve!==l.nom)?'<small>Déclaré à l\'activation : '+esc(l.nomEleve||'—')+' · '+esc(l.telEleve||'—')+'</small>':'')+'</div><div class="acts">'+acts+'</div></div>';
-  }).join('');
+  }).join('');requestAnimationFrame(function(){el.style.minHeight='';window.scrollTo(0,y);});
 }
 function adminAct(a,code){
   var lib={reset:'Libérer les appareils de',revoke:'Désactiver',unrevoke:'Réactiver'}[a];if(!confirm(lib+' le code '+code+' ?'))return;
