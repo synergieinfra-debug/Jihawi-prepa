@@ -325,8 +325,8 @@ var I=(function(){
  var D={
   defs:function(){return '<defs><marker id="arw" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#8a6d3b"/></marker><linearGradient id="thg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b5452c"/><stop offset="1" stop-color="#8a2e1e"/></linearGradient><linearGradient id="thg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1f6f78"/><stop offset="1" stop-color="#174f56"/></linearGradient></defs>';},
   fond:function(h){return '<rect width="360" height="'+(h||220)+'" fill="#fbf0dc"/>';},
-  pill:function(x,y,w,h,titre,sous,g){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+(h/2)+'" fill="url(#'+(g||'thg')+')"/>'+(sous?'<text x="'+(x+w/2)+'" y="'+(y+h*.42)+'" text-anchor="middle" font-size="9" fill="#f3e6c9" letter-spacing="1">'+sous+'</text><text x="'+(x+w/2)+'" y="'+(y+h*.8)+'" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">'+titre+'</text>':'<text x="'+(x+w/2)+'" y="'+(y+h*.64)+'" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">'+titre+'</text>');},
-  box:function(x,y,w,h,c,titre,lignes,note,clair){var t=clair?'#2b2118':'#fff',t2=clair?'#4a3a2a':'#f3ecdc',t3=clair?'#7a6a58':'#e8dcc4';var fit=function(txt,fs,k){var L=String(txt).replace(/<[^>]+>/g,'').length;return Math.max(6.5,Math.min(fs,(w-10)/(L*k||1)));};var fsT=fit(titre,11,0.52);var o='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="10" fill="'+c+'"/><text x="'+(x+w/2)+'" y="'+(y+18)+'" text-anchor="middle" font-size="'+fsT.toFixed(1)+'" font-weight="700" fill="'+t+'">'+titre+'</text>';(lignes||[]).forEach(function(l,i){o+='<text x="'+(x+w/2)+'" y="'+(y+33+i*12)+'" text-anchor="middle" font-size="'+fit(l,9,0.5).toFixed(1)+'" fill="'+t2+'">'+l+'</text>';});if(note)o+='<text x="'+(x+w/2)+'" y="'+(y+h-8)+'" text-anchor="middle" font-size="8.5" font-style="italic" fill="'+t3+'">'+note+'</text>';return o;},
+  pill:function(x,y,w,h,titre,sous,g){var L=String(titre).replace(/<[^>]+>/g,'').length,fs=Math.max(8,Math.min(12,(w-16)/(L*0.56||1)));return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+(h/2)+'" fill="url(#'+(g||'thg')+')"/>'+(sous?'<text x="'+(x+w/2)+'" y="'+(y+h*.42)+'" text-anchor="middle" font-size="9" fill="#f3e6c9" letter-spacing="1">'+sous+'</text><text x="'+(x+w/2)+'" y="'+(y+h*.8)+'" text-anchor="middle" font-size="'+fs.toFixed(1)+'" font-weight="700" fill="#fff">'+titre+'</text>':'<text x="'+(x+w/2)+'" y="'+(y+h*.64)+'" text-anchor="middle" font-size="'+fs.toFixed(1)+'" font-weight="700" fill="#fff">'+titre+'</text>');},
+  box:function(x,y,w,h,c,titre,lignes,note,clair){var t=clair?'#2b2118':'#fff',t2=clair?'#4a3a2a':'#f3ecdc',t3=clair?'#7a6a58':'#e8dcc4';var fit=function(txt,fs,k){var T=String(txt).replace(/<[^>]+>/g,''),L=0;for(var q=0;q<T.length;q++){var ch=T[q];L+=(ch!==ch.toLowerCase()&&ch===ch.toUpperCase())?1.3:(ch===' '||ch==='·'||ch==='i'||ch==='l'||ch==='.'||ch===','?0.6:1);}return Math.max(6.5,Math.min(fs,(w-10)/(L*k||1)));};var fsT=fit(titre,11,0.52);var o='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="10" fill="'+c+'"/><text x="'+(x+w/2)+'" y="'+(y+18)+'" text-anchor="middle" font-size="'+fsT.toFixed(1)+'" font-weight="700" fill="'+t+'">'+titre+'</text>';(lignes||[]).forEach(function(l,i){o+='<text x="'+(x+w/2)+'" y="'+(y+33+i*12)+'" text-anchor="middle" font-size="'+fit(l,9,0.5).toFixed(1)+'" fill="'+t2+'">'+l+'</text>';});if(note)o+='<text x="'+(x+w/2)+'" y="'+(y+h-8)+'" text-anchor="middle" font-size="8.5" font-style="italic" fill="'+t3+'">'+note+'</text>';return o;},
   fleche:function(d){return '<path d="'+d+'" stroke="#8a6d3b" stroke-width="2" fill="none" marker-end="url(#arw)"/>';},
   trait:function(d,c,dash){return '<path d="'+d+'" stroke="'+(c||'#8a6d3b')+'" stroke-width="2" fill="none"'+(dash?' stroke-dasharray="5 4"':'')+'/>';},
   etiq:function(x,y,txt,c){return '<text x="'+x+'" y="'+y+'" text-anchor="middle" font-size="8.5" font-style="italic" fill="'+(c||'#7a6a58')+'">'+txt+'</text>';},
@@ -1253,6 +1253,246 @@ addAr('ddc',0,{tip:"أشهر استهلال في المقرر. يرد كل سن�
  {p:"تُوضع ثلاثة أشياء: راوٍ <b>مجهول</b> (لا اسم ولا جريمة)، <b>وضعية</b> بلا مخرج (الموت المؤكد)، و<b>شكل</b> (المونولوغ الداخلي في الحاضر). يعرف القارئ النهاية سلفاً؛ وسيعيش الانتظار <b>من الداخل</b>."}
 ]});
 
+/* === fr/00-oeuvre.js === */
+/* Épreuve de français — Compléments : référentiel, outils d'analyse, langue, production écrite */
+(function(){
+var b=I.D.box,f=I.D.fleche,pill=I.D.pill,band=I.D.bandeau,svg=I.D.svg;
+var spec=svg(206,[pill(50,8,260,28,'L\'épreuve régionale · 2 h · 20 points'),
+  b(8,46,206,96,'#1f6f78','ÉTUDE DE TEXTE · 10 pts',['10 items sur un passage d\'une œuvre','Contextualiser : 2 items · 2 pts','Analyser : 6 items · 6 pts','Réagir : 2 items · 2 pts']),
+  b(224,46,128,96,'#b5452c','PRODUCTION ÉCRITE · 10 pts',['texte argumentatif','Discours : 5 pts','Langue : 5 pts']),
+  b(8,150,344,24,'#fff3e0','Items à réponse choisie (QCM, vrai/faux + justification) et items à réponse construite',[],null,true),
+  band(182,'Langue intégrée à l\'étude de texte : relier chaque fait de langue au sens')]);
+var temps=svg(120,[pill(100,6,160,26,'Gérer les 2 heures'),
+  b(8,42,70,52,'#8a6d3b','10 min',['lire 2 fois','souligner']),f('M78 68 H88'),
+  b(90,42,96,52,'#1f6f78','45 min',['10 items','réponses justifiées']),f('M186 68 H196'),
+  b(198,42,96,52,'#b5452c','50 min',['production écrite','brouillon → propre']),f('M294 68 H304'),
+  b(306,42,46,52,'#d9a441','15 min',['relire'],null,true)]);
+reg({
+ id:'fr', noTrad:true, titre:'Épreuve de français', auteur:'Outils d\'analyse · Langue · Production écrite', genre:'Compléments transversaux aux trois œuvres',
+ nav:{oeuvre:'Référentiel',chapitres:'Analyse',persos:'Langue',exam:'Examen',methode:'Production'},
+ chapLabel:'Outils d\'analyse du texte · 12 leçons', chapShort:'Leçon',
+ langueLabel:'Langue : grammaire, conjugaison, expression · 10 leçons', langueShort:'Leçon',
+ fiche:'<div class="card"><h2>Le cadre de référence de l\'examen régional</h2><p>L\'épreuve de français de 1ʳᵉ année bac est définie par le <b>cadre de référence</b> du ministère de l\'Éducation nationale : une épreuve de <b>2 heures</b>, notée sur <b>20</b>, composée d\'une <b>étude de texte</b> (10 points) portant sur un ou deux passages des œuvres au programme et d\'une <b>production écrite</b> (10 points). Les trois œuvres : <i>La Boîte à merveilles</i> (Sefrioui), <i>Antigone</i> (Anouilh), <i>Le Dernier Jour d\'un condamné</i> (Hugo) — révisées dans la partie « Les œuvres » de l\'application. Ce module rassemble <b>tout le reste</b> : les outils d\'analyse exigés par les items, la rubrique « langue » de la progression officielle et la méthode de la production écrite.</p>'
+ +'<div class="fig">'+spec+'</div>'
+ +'<h3>Tableau de spécification officiel</h3><table><tr><th>Domaine</th><th>Capacité / critère</th><th>Items</th><th>Pts</th></tr>'
+ +'<tr><td rowspan="3">Étude de texte</td><td><b>Contextualiser</b> : titre, auteur, genre, courant, date ; situer le passage ; contexte historique et culturel</td><td>2</td><td>2</td></tr>'
+ +'<tr><td><b>Analyser</b> : type et structure du texte, intention, contenu ; relier un fait de langue ou de style au sens (indices, inférences, justification)</td><td>6</td><td>6</td></tr>'
+ +'<tr><td><b>Réagir</b> : apprécier des valeurs, synthétiser ou interpréter, porter un jugement justifié</td><td>2</td><td>2</td></tr>'
+ +'<tr><td rowspan="2">Production écrite</td><td><b>Discours</b> : respect de la consigne, cohérence de l\'argumentation, organisation et progression</td><td rowspan="2">1 sujet</td><td>5</td></tr>'
+ +'<tr><td><b>Langue</b> : vocabulaire précis et varié, syntaxe, ponctuation, orthographe, conjugaison</td><td>5</td></tr></table>'
+ +'<h3>Ce que les 10 items demandent vraiment</h3><table><tr><th>Items</th><th>Questions typiques</th><th>Leçon du module</th></tr>'
+ +'<tr><td>1-2 Contextualiser</td><td>Complétez la fiche de l\'œuvre · Situez le passage · À quel genre appartient l\'œuvre ?</td><td>Analyse 1</td></tr>'
+ +'<tr><td>3-8 Analyser</td><td>Type de texte · Qui parle ? à qui ? · Relevez le champ lexical de… · Identifiez la figure de style et son effet · Quel est le registre ? · Valeur du temps verbal · Type de discours rapporté · Thèse et arguments · Focalisation · Type et forme de la phrase</td><td>Analyse 2 à 12, Langue 1 à 10</td></tr>'
+ +'<tr><td>9-10 Réagir</td><td>Partagez-vous l\'avis du narrateur ? Justifiez · Que pensez-vous de l\'attitude de… ? · Cette situation existe-t-elle aujourd\'hui ?</td><td>Analyse 1</td></tr></table>'
+ +'<div class="fig">'+temps+'</div>'
+ +'<h3>La rubrique « langue » de la progression officielle</h3><table><tr><th>Module</th><th>Faits de langue et de style travaillés</th></tr>'
+ +'<tr><td>1 · <i>La Boîte à merveilles</i> (roman autobiographique)</td><td>Énonciation (je narrant / je narré), temps du récit et leurs valeurs, description (comparaison, métaphore, adjectifs), indicateurs spatio-temporels, champ lexical, focalisation, discours rapporté, registres lyrique et réaliste</td></tr>'
+ +'<tr><td>2 · <i>Antigone</i> (tragédie moderne)</td><td>Lexique du théâtre (didascalies, tirade, réplique, chœur, prologue), double énonciation, types et formes de phrases, registres tragique / pathétique / ironique, argumentation dans le dialogue, modalisateurs, figures d\'opposition et d\'insistance</td></tr>'
+ +'<tr><td>3 · <i>Le Dernier Jour d\'un condamné</i> (roman à thèse)</td><td>Texte argumentatif (thèse, arguments, exemples, connecteurs logiques), monologue intérieur, registres pathétique et ironique, ponctuation expressive, hyperbole et antithèse, expression de la cause, de la conséquence, de l\'opposition et de l\'hypothèse, lexique de la justice</td></tr></table>'
+ +'<h3>Les 8 erreurs qui coûtent le plus de points</h3><ul><li>Répondre « métaphore » sans <b>citer</b> le mot et sans dire son <b>effet</b> : la moitié des points perdue.</li><li>Confondre <b>registre</b> (tragique, pathétique…) et <b>type de texte</b> (narratif, argumentatif…).</li><li>Situer le passage par « au milieu du livre » au lieu d\'un événement précis avant / après.</li><li>Oublier de <b>justifier</b> un vrai / faux ou un QCM quand on le demande.</li><li>Réagir en une ligne sans argument : « oui je suis d\'accord ».</li><li>Production écrite hors sujet (raconter au lieu d\'argumenter) ou sans conclusion.</li><li>Oublier les <b>connecteurs</b> : la copie semble un bloc.</li><li>Ne pas relire : accords, ponctuation et conjugaison valent 5 points.</li></ul></div>',
+ notions:[
+  {n:"Contextualiser",d:"Donner les repères de l'œuvre (titre, auteur, genre, date, courant) et situer le passage par ce qui précède et ce qui suit."},
+  {n:"Analyser",d:"Relier un fait de langue ou de style (figure, temps, lexique, énonciation) au sens du passage."},
+  {n:"Réagir",d:"Donner un avis personnel justifié sur une idée, une valeur ou un comportement du texte."},
+  {n:"Texte narratif",d:"Raconte des événements : passé simple / imparfait, connecteurs temporels, narrateur."},
+  {n:"Texte descriptif",d:"Donne à voir : imparfait, adjectifs, repères spatiaux, verbes de perception."},
+  {n:"Texte argumentatif",d:"Défend une thèse : présent, connecteurs logiques, verbes d'opinion, exemples."},
+  {n:"Texte explicatif",d:"Fait comprendre un fait de façon neutre : présent de vérité générale, définitions."},
+  {n:"Texte injonctif",d:"Donne des ordres ou conseils : impératif, infinitif, « il faut »."},
+  {n:"Énonciation",d:"Situation de production d'un énoncé : qui parle, à qui, où, quand."},
+  {n:"Discours / récit",d:"Discours : ancré dans la situation (je, ici, maintenant, présent). Récit : coupé de la situation (il, là-bas, passé simple)."},
+  {n:"Je narrant / je narré",d:"Dans l'autobiographie : l'adulte qui écrit (narrant) et l'enfant dont on raconte l'histoire (narré)."},
+  {n:"Modalisateur",d:"Mot qui marque le degré de certitude ou le jugement du locuteur : peut-être, sans doute, hélas, il me semble."},
+  {n:"Focalisation interne",d:"Le récit passe par la conscience d'un personnage ; on ne sait que ce qu'il sait."},
+  {n:"Focalisation externe",d:"Le narrateur rapporte ce qu'une caméra verrait, sans pensées."},
+  {n:"Focalisation zéro",d:"Narrateur omniscient : il sait tout de tous."},
+  {n:"Narrateur-personnage",d:"Narrateur à la 1ʳᵉ personne qui participe à l'histoire (Sidi Mohammed, le condamné)."},
+  {n:"Passé simple",d:"Actions de premier plan, ponctuelles, qui font avancer le récit."},
+  {n:"Imparfait",d:"Arrière-plan : description, habitude, durée, actions en cours."},
+  {n:"Présent de narration",d:"Présent employé dans un récit au passé pour rendre la scène vivante."},
+  {n:"Présent de vérité générale",d:"Présent des maximes et des idées toujours vraies : « L'homme est… »."},
+  {n:"Discours direct",d:"Paroles telles quelles, guillemets, verbe de parole : Il dit : « Je pars. »"},
+  {n:"Discours indirect",d:"Paroles intégrées dans une subordonnée : Il dit qu'il partait."},
+  {n:"Discours indirect libre",d:"Paroles ou pensées sans verbe introducteur ni guillemets, à la 3ᵉ personne et au temps du récit : Il partirait demain, c'était décidé."},
+  {n:"Comparaison",d:"Rapproche deux éléments avec un outil (comme, tel, semblable à)."},
+  {n:"Métaphore",d:"Rapprochement sans outil de comparaison ; filée si elle se prolonge."},
+  {n:"Personnification",d:"Prête des traits humains à une chose ou une idée."},
+  {n:"Allégorie",d:"Représentation concrète d'une idée abstraite (la Mort, la Justice)."},
+  {n:"Métonymie",d:"Désigne par un terme lié : boire un verre, la couronne pour le roi."},
+  {n:"Périphrase",d:"Remplace un mot par une expression : la machine (pour la guillotine)."},
+  {n:"Antithèse",d:"Oppose deux termes dans une phrase : la vie / la mort, l'ombre / la lumière."},
+  {n:"Oxymore",d:"Alliance de deux mots contradictoires : une obscure clarté."},
+  {n:"Hyperbole",d:"Exagération : mourir de peur, mille fois."},
+  {n:"Litote",d:"Dire moins pour suggérer plus : ce n'est pas mal (= c'est très bien)."},
+  {n:"Euphémisme",d:"Adoucit une réalité brutale : il nous a quittés."},
+  {n:"Gradation",d:"Succession de termes d'intensité croissante ou décroissante."},
+  {n:"Anaphore",d:"Répétition d'un mot en tête de phrases ou de vers."},
+  {n:"Énumération / accumulation",d:"Suite de termes de même nature, effet d'abondance."},
+  {n:"Antiphrase / ironie",d:"Dire le contraire de ce que l'on pense pour se moquer."},
+  {n:"Question rhétorique",d:"Question qui n'attend pas de réponse, pour convaincre ou émouvoir."},
+  {n:"Chiasme",d:"Structure croisée AB / BA : il faut manger pour vivre et non vivre pour manger."},
+  {n:"Registre tragique",d:"Personnage écrasé par un destin inéluctable ; lexique de la fatalité, de la mort."},
+  {n:"Registre pathétique",d:"Vise à émouvoir, à faire pleurer : souffrance, exclamations, champ lexical de la douleur."},
+  {n:"Registre lyrique",d:"Expression des sentiments personnels à la 1ʳᵉ personne."},
+  {n:"Registre ironique / satirique",d:"Se moque par l'antiphrase, l'exagération, pour critiquer."},
+  {n:"Registre polémique",d:"Attaque violente d'une idée ou d'une personne ; lexique dévalorisant, apostrophes."},
+  {n:"Registre comique",d:"Fait rire : quiproquo, exagération, jeux de mots, comique de gestes."},
+  {n:"Registre épique",d:"Grandit héros et combats : hyperboles, pluriels, forces collectives."},
+  {n:"Registre réaliste",d:"Décrit fidèlement la réalité sociale et quotidienne."},
+  {n:"Champ lexical",d:"Mots d'un texte renvoyant à une même idée (peur, religion, justice)."},
+  {n:"Champ sémantique",d:"Ensemble des sens d'un même mot (« pièce » : théâtre, monnaie, salle)."},
+  {n:"Connotation",d:"Sens suggéré, affectif, ajouté au sens premier (dénotation)."},
+  {n:"Mélioratif / péjoratif",d:"Vocabulaire valorisant (admirable) ou dévalorisant (minable)."},
+  {n:"Didascalie",d:"Indication scénique en italique : gestes, ton, décor."},
+  {n:"Tirade",d:"Longue réplique d'un personnage sans interruption."},
+  {n:"Monologue",d:"Personnage seul qui parle ; au théâtre, livre ses pensées au public."},
+  {n:"Double énonciation",d:"Au théâtre, le personnage parle à un autre personnage ET au public."},
+  {n:"Prologue / Chœur",d:"Chez Anouilh : voix qui présente les personnages et commente la tragédie."},
+  {n:"Thèse",d:"Idée défendue par l'auteur ou le locuteur."},
+  {n:"Argument",d:"Raison qui soutient la thèse ; l'exemple l'illustre."},
+  {n:"Connecteur logique",d:"Mot de liaison qui marque cause, conséquence, opposition, addition…"},
+  {n:"Plan dialectique",d:"Thèse → antithèse → synthèse (dépassement)."},
+  {n:"Plan analytique",d:"Constat / causes / conséquences / solutions."},
+  {n:"Roman à thèse",d:"Récit au service d'une idée à défendre (Hugo contre la peine de mort)."},
+  {n:"Autobiographie",d:"Récit rétrospectif qu'une personne fait de sa propre vie (pacte autobiographique : auteur = narrateur = personnage)."},
+  {n:"Tragédie",d:"Pièce où le héros, prisonnier de la fatalité, va vers une fin malheureuse et connue d'avance."}
+ ],
+ methode:'<div class="card"><h2>Production écrite — la méthode complète</h2><p>10 points : <b>5 pour le discours</b> (consigne respectée, argumentation cohérente, texte organisé et progressif) et <b>5 pour la langue</b> (vocabulaire précis, syntaxe, ponctuation, orthographe, conjugaison). Le sujet est un <b>texte argumentatif</b> en lien avec un thème des œuvres : ce n\'est <b>ni un résumé, ni une dissertation littéraire</b>.</p>'
+ +'<div class="fig">'+I.D.planRedaction()+'</div>'
+ +'<h3>Les 6 étapes au brouillon (15 min)</h3><ol><li><b>Décoder la consigne</b> : souligner le thème, le verbe (<i>discutez, partagez-vous, défendez</i>) et la forme attendue (lettre, article, texte).</li><li><b>Choisir le plan</b> : « Partagez-vous cet avis ? » → dialectique (thèse / antithèse / synthèse) ; « Quelles sont les causes et les solutions ? » → analytique ; « Défendez… » → un seul point de vue, 3 arguments.</li><li><b>Trouver 3 arguments</b> (un par domaine : individuel, familial / social, moral ou économique) et <b>un exemple</b> pour chacun (œuvre, actualité, expérience).</li><li><b>Rédiger l\'introduction</b> : amorce (constat général) → sujet reformulé → question → annonce du plan.</li><li><b>Un paragraphe par argument</b>, ouvert par un connecteur, avec l\'exemple et une phrase de bilan.</li><li><b>Conclure</b> : bilan + avis personnel + ouverture (question ou élargissement).</li></ol>'
+ +'<h3>Grille du correcteur (à appliquer soi-même)</h3><table><tr><th>Critère</th><th>Pts</th><th>Vérifier</th></tr><tr><td>Conformité à la consigne</td><td>1,5</td><td>Thème exact, forme demandée, longueur (15-20 lignes)</td></tr><tr><td>Cohérence de l\'argumentation</td><td>2</td><td>Thèse claire, arguments pertinents et illustrés, pas de contradiction</td></tr><tr><td>Organisation et progression</td><td>1,5</td><td>Intro / 2-3 paragraphes / conclusion, connecteurs</td></tr><tr><td>Vocabulaire</td><td>1,5</td><td>Précis, varié, pas de répétitions ni de familiarités</td></tr><tr><td>Syntaxe et ponctuation</td><td>1,5</td><td>Phrases complètes, virgules, pas de phrases de 6 lignes</td></tr><tr><td>Orthographe et conjugaison</td><td>2</td><td>Accords, participes passés, temps du présent de l\'argumentation</td></tr></table>'
+ +'<h3>Banque de connecteurs</h3><table><tr><th>Fonction</th><th>Connecteurs</th></tr><tr><td>Introduire</td><td>De nos jours · Il est fréquent de constater que · On s\'interroge souvent sur</td></tr><tr><td>Énumérer</td><td>D\'abord · Ensuite · De plus · Par ailleurs · Enfin</td></tr><tr><td>Illustrer</td><td>Par exemple · Ainsi · C\'est le cas de · Comme le montre</td></tr><tr><td>Opposer / concéder</td><td>Cependant · Toutefois · Certes… mais · Néanmoins · En revanche</td></tr><tr><td>Cause / conséquence</td><td>Car · En effet · Parce que · Donc · Par conséquent · C\'est pourquoi</td></tr><tr><td>Conclure</td><td>En somme · En définitive · Pour conclure · Finalement</td></tr></table>'
+ +'<h3>Les thèmes transversaux du régional</h3><p>La peine de mort et la justice (<i>DJC</i>) · le devoir et le bonheur, la révolte, le pouvoir (<i>Antigone</i>) · l\'enfance, la solitude, la pauvreté, les traditions et la superstition, la place de la femme, l\'école (<i>LBM</i>) · l\'amitié, la famille, la lecture, les réseaux sociaux, la violence, le travail des enfants. Les productions modèles ci-dessous en traitent une par une, avec le plan apparent et les connecteurs surlignés.</p></div>'
+});
+})();
+
+/* === fr/01-a01.js === */
+/* Analyse 1 — Contextualiser et réagir (items 1-2 et 9-10) */
+(function(){
+var b=I.D.box,f=I.D.fleche,pill=I.D.pill,band=I.D.bandeau,svg=I.D.svg;
+var kh=svg(190,[pill(90,8,180,28,'Situer un passage en 3 temps'),
+  b(8,46,108,70,'#1f6f78','AVANT',['ce qui vient de','se passer (1 phrase)']),f('M116 81 H126'),
+  b(128,46,104,70,'#b5452c','LE PASSAGE',['qui ? où ? quoi ?','moment de l\'intrigue']),f('M232 81 H242'),
+  b(244,46,108,70,'#8a6d3b','APRÈS',['ce que cela','prépare ou provoque']),
+  band(130,'« Ce passage se situe au chapitre… , juste après… ; le narrateur… ; il annonce… »'),
+  band(160,'Réagir = avis + argument + exemple (3 phrases minimum)')]);
+addChap('fr',{
+ titre:"Contextualiser et réagir", sous:"Items 1-2 et 9-10 · Fiche de l'œuvre, situation du passage, contexte ; avis personnel justifié",
+ tip:'Quatre items sur dix (4 points) ne demandent <b>aucune analyse stylistique</b> : il faut connaître les trois fiches d\'œuvres par cœur et savoir rédiger une réaction en trois phrases. Ce sont les points les plus faciles de l\'épreuve, et les plus souvent bâclés.',
+ episodes:[
+  {t:'Item 1 : la fiche de l\'œuvre',svg:kh,cap:'Situer, c\'est encadrer le passage par un avant et un après précis.',
+   p:'La première question demande presque toujours de <b>compléter un tableau</b> ou de répondre à des questions sur l\'œuvre : <b>titre, auteur, genre, date de parution, courant ou siècle, personnage principal</b>. Les trois fiches à savoir : <b>La Boîte à merveilles</b> — Ahmed Sefrioui, 1954, roman autobiographique, Fès des années 1920-1930, narrateur Sidi Mohammed (6 ans) ; <b>Antigone</b> — Jean Anouilh, 1944 (créée à Paris sous l\'Occupation), tragédie moderne en prose, un acte sans division, réécriture de Sophocle ; <b>Le Dernier Jour d\'un condamné</b> — Victor Hugo, 1829, roman à thèse (plaidoyer contre la peine de mort), 49 chapitres, journal d\'un condamné anonyme, romantisme. Pièges : <b>genre</b> ≠ <b>type de texte</b> (le genre est roman, tragédie, autobiographie ; le type est narratif, descriptif, argumentatif) ; « roman autobiographique » et non « autobiographie » pour Sefrioui (le narrateur n\'a pas le nom de l\'auteur) ; Anouilh écrit en prose, sans actes ni scènes.',
+   k:'<b>À retenir :</b> 1954 · 1944 · 1829. Genres : roman autobiographique · tragédie moderne · roman à thèse. Courants : littérature marocaine d\'expression française · réécriture du mythe antique (théâtre du XXᵉ) · romantisme.'},
+  {t:'Item 2 : situer le passage et son contexte',
+   p:'Situer, c\'est <b>encadrer</b> : dire <b>ce qui précède</b>, <b>ce qui se passe</b> dans le passage et <b>ce qui suit</b>, avec des repères précis (chapitre, événement, personnages). Formule type : « Ce passage est extrait du chapitre X de… Il se situe juste après… (événement) ; le narrateur / le personnage y… ; il prépare… ». Le <b>contexte historique et culturel</b> peut aussi être demandé : le Maroc traditionnel sous le protectorat (LBM : Msid, hammam, Achoura, voyante, artisans) ; la France occupée de 1944 et la question de la résistance / de l\'obéissance (Antigone) ; la France de la Restauration où les exécutions sont publiques, place de Grève (DJC). Indices pour retrouver le moment : LBM — présence ou absence du père (parti aux moissons ch. 9-11), âge du narrateur, fêtes ; Antigone — Antigone est-elle déjà arrêtée ? (ordre : Prologue → Nourrice → Ismène → Hémon → les gardes → Créon → Chœur → fin) ; DJC — lieu (Bicêtre ch. 1-21, Conciergerie ch. 22-47, Hôtel de Ville ch. 48-49), heure annoncée.',
+   k:'<b>Formule :</b> « Ce passage se situe… juste après… ; il montre… ; il annonce… ». Trois repères concrets valent mieux qu\'un résumé.'},
+  {t:'Items 9-10 : réagir',
+   p:'La capacité « réagir » évalue votre aptitude à <b>porter un jugement justifié</b> sur une idée, une valeur ou un comportement du texte (la superstition de Lalla Zoubida, le refus d\'Antigone, le réalisme de Créon, la cruauté de la foule devant l\'échafaud…). Attendu : <b>une prise de position claire</b> (« Je partage / je ne partage pas… »), <b>un argument</b> (« car… »), <b>un exemple ou une référence</b> (au texte, à la réalité d\'aujourd\'hui, à une autre œuvre). Trois à cinq phrases suffisent ; une seule phrase ne rapporte rien. Les correcteurs valorisent la nuance (« certes… mais… ») et la référence aux <b>valeurs</b> (justice, dignité, liberté, solidarité, tolérance) et aux <b>éléments de civilisation</b> (traditions, religion, fêtes, rapport à l\'autorité). Évitez le hors-sujet moral (« c\'est mal de… ») et le résumé du texte.',
+   k:'<b>Modèle :</b> « Je partage l\'avis de… , car… . En effet, aujourd\'hui encore… . Toutefois, il faut reconnaître que… ».'},
+  {t:'Exemple corrigé',
+   p:'<b>Consigne :</b> « Lalla Zoubida consulte une voyante pour connaître l\'avenir de sa famille. Que pensez-vous de ce comportement ? Justifiez. » <b>Réponse faible (0,5/1) :</b> « Je pense que c\'est pas bien parce que la voyante ment. » <b>Réponse complète (1/1) :</b> « Je comprends l\'inquiétude de Lalla Zoubida, car dans le Fès traditionnel la voyante remplaçait souvent le médecin et le conseiller. Cependant, je ne partage pas ce recours à la superstition : il entretient la peur et l\'illusion au lieu de résoudre les problèmes réels de la famille, comme la pauvreté après le départ du père. Aujourd\'hui encore, certaines personnes consultent des voyants ; l\'école et la raison restent, à mon sens, de meilleurs guides. » Observer : avis nuancé, cause, exemple du texte, ouverture sur le présent.',
+   k:'<b>Barème mental :</b> avis clair 0,25 · argument 0,5 · exemple / nuance 0,25.'}
+ ],
+ analyse:[['Genre','Roman, tragédie, autobiographie… (ce qu\'est l\'œuvre)'],['Type de texte','Narratif, descriptif, argumentatif… (ce que fait le passage)'],['Courant','Romantisme, littérature maghrébine d\'expression française, théâtre de la réécriture'],['Situer','Avant / passage / après avec repères précis'],['Réagir','Avis + argument + exemple, 3 à 5 phrases'],['Valeurs','Justice, liberté, dignité, solidarité, tolérance, courage']],
+ analyseTitre:'Mots-clés des items 1-2 et 9-10', analyseCols:['Terme','Ce qu\'il désigne'],
+ citations:'<b>Contextualiser :</b> fiche (titre, auteur, date, genre, courant) → situer (avant / passage / après) → contexte historique et culturel. <b>Réagir :</b> position claire → argument → exemple → nuance.',
+ quiz:[
+  {t:'Fiche',s:'Le Dernier Jour d\'un condamné est publié en :',o:['1794','1829','1862','1944'],a:1,e:'Hugo a 27 ans ; Les Misérables date de 1862.'},
+  {t:'Genre',s:'La Boîte à merveilles est :',o:['une autobiographie','un roman autobiographique','un conte','un roman à thèse'],a:1,e:'Le narrateur Sidi Mohammed n\'a pas le nom de l\'auteur : pas de pacte autobiographique strict.'},
+  {t:'Genre',s:'Antigone d\'Anouilh est :',o:['une tragédie classique en vers et en cinq actes','une tragédie moderne en prose, sans actes ni scènes','une comédie','un drame romantique'],a:1,e:'Créée en 1944, réécriture de Sophocle.'},
+  {t:'Piège',s:'« Genre » et « type de texte » :',o:['sont synonymes','le genre qualifie l\'œuvre (roman), le type qualifie le passage (narratif)','le type qualifie l\'œuvre','aucun des deux n\'est demandé'],a:1,e:'Un roman peut contenir un passage argumentatif.'},
+  {t:'Situer',s:'La meilleure façon de situer un passage :',o:['« au milieu du livre »','« ce passage se situe juste après… et annonce… »','« c\'est un passage important »','« dans la première partie »'],a:1,e:'Un repère concret avant et après.'},
+  {t:'Contexte',s:'Le contexte historique d\'Antigone (1944) :',o:['la Révolution française','la France sous l\'Occupation allemande','la guerre d\'Algérie','le Second Empire'],a:1,e:'D\'où la lecture du conflit obéissance / résistance.'},
+  {t:'Réagir',s:'Une bonne réaction (items 9-10) comporte :',o:['un résumé du texte','un avis, un argument et un exemple','une seule phrase « je suis d\'accord »','une liste de figures de style'],a:1,e:'3 à 5 phrases, avec nuance si possible.'},
+  {t:'Rédaction',s:'Réagissez en 4-5 phrases : « Créon affirme qu\'il faut bien que quelqu\'un dise oui et gouverne le pays. Partagez-vous son point de vue ? »',open:true,m:'Je comprends la position de Créon : gouverner impose de prendre des décisions impopulaires et d\'assurer l\'ordre, sans quoi la cité sombre dans le chaos ; il a accepté « le métier » par devoir, non par goût. Cependant, je ne partage pas entièrement son point de vue, car dire oui à tout, y compris à l\'injustice, revient à renoncer à sa conscience : c\'est précisément ce qu\'Antigone refuse en voulant enterrer son frère. Aujourd\'hui encore, les sociétés ont besoin de responsables qui disent oui à l\'ordre, mais aussi de citoyens capables de dire non à l\'arbitraire. L\'équilibre entre les deux fait, à mon sens, une société juste.'}
+ ]
+});
+})();
+
+/* === fr/01-l01.js === */
+/* Langue 1 — Types et formes de phrases */
+(function(){
+var b=I.D.box,f=I.D.fleche,pill=I.D.pill,band=I.D.bandeau,svg=I.D.svg;
+var kh=svg(230,[pill(100,8,160,28,'La phrase : types et formes'),
+  b(8,46,166,30,'#1f6f78','4 TYPES (un seul par phrase)',[]),b(186,46,166,30,'#b5452c','FORMES (cumulables)',[]),
+  b(8,82,166,24,'#e8f3f4','déclarative · interrogative',[],null,true),b(186,82,166,24,'#fbeae5','affirmative / négative',[],null,true),
+  b(8,110,166,24,'#e8f3f4','exclamative · injonctive (impérative)',[],null,true),b(186,110,166,24,'#fbeae5','active / passive',[],null,true),
+  b(186,138,166,24,'#fbeae5','neutre / emphatique · personnelle / impersonnelle',[],null,true),
+  band(184,'Les types et formes révèlent l\'intention et l\'émotion : à relier au registre')]);
+addLangue('fr',{
+ titre:"Types et formes de phrases", sous:"Déclarative, interrogative, exclamative, injonctive · négative, passive, emphatique, impersonnelle · valeurs expressives",
+ tip:'Item de langue très fréquent : « Quel est le type de cette phrase ? Quelle est sa forme ? Quelle est sa valeur ? » Les tragédies et les plaidoyers regorgent d\'interrogatives, d\'exclamatives et de négations : savoir dire <b>ce qu\'elles expriment</b> (révolte, doute, ordre, refus).',
+ episodes:[
+  {t:'Les quatre types',svg:kh,cap:'Un type obligatoire, des formes qui s\'ajoutent.',
+   p:'<b>Déclarative</b> : énonce un fait, point final (<i>Le père est parti aux moissons.</i>). <b>Interrogative</b> : pose une question, point d\'interrogation ; <b>totale</b> (réponse oui / non : <i>Viens-tu ? Est-ce que tu viens ? Tu viens ?</i>) ou <b>partielle</b> (mot interrogatif : <i>Pourquoi pars-tu ?</i>) ; <b>directe</b> (point d\'interrogation) ou <b>indirecte</b> (subordonnée : <i>je me demande si tu viens</i>) ; trois niveaux : inversion (soutenu), « est-ce que » (courant), intonation (familier). <b>Exclamative</b> : exprime une émotion, point d\'exclamation, souvent avec <i>que, comme, quel</i> (<i>Quelle nuit !</i>) ou une phrase nominale (<i>Condamné à mort !</i>). <b>Injonctive</b> (impérative) : ordre, conseil, prière, interdiction ; impératif (<i>Sortez !</i>), subjonctif (<i>Qu\'il entre.</i>), infinitif (<i>Ne pas se pencher</i>), futur (<i>Tu ne tueras point</i>), « il faut ». Valeurs stylistiques : l\'<b>interrogative</b> peut être <b>rhétorique</b> (affirmation déguisée), <b>délibérative</b> (le personnage s\'interroge : <i>Que faire ?</i>) ; l\'<b>exclamative</b> traduit le <b>pathétique</b>, la colère, l\'émerveillement ; l\'<b>injonctive</b> marque l\'autorité (Créon) ou la supplication (<i>Grâce !</i>).',
+   k:'<b>Question type :</b> « Quel est le type de la phrase “Que faire ?” et que traduit-il ? » → interrogative délibérative : le désarroi du personnage.'},
+  {t:'Les formes',
+   p:'<b>Affirmative / négative</b> : la négation se construit avec <b>ne… pas / plus / jamais / rien / personne / aucun / ni… ni / guère / que</b> (restriction : <i>je n\'ai que toi</i>) ; <b>négation totale</b> (ne… pas) ou <b>partielle</b> (ne… plus, jamais, personne) ; <b>lexicale</b> (préfixes in-, dé-, mal- ; <i>injuste, incapable</i>) ; valeur : le <b>refus</b> d\'Antigone (« Je ne veux pas comprendre »), le <b>néant</b> du condamné (« rien, personne »). <b>Active / passive</b> : à la passive, le complément d\'objet devient sujet, le verbe prend <i>être</i> + participe, l\'agent est introduit par <i>par</i> (ou <i>de</i>) ou disparaît (<i>Le condamné a été conduit à la Grève</i>) ; valeur : mettre en relief la <b>victime</b>, <b>effacer</b> le responsable (la société anonyme qui tue). <b>Neutre / emphatique</b> : mise en relief par <b>détachement</b> et reprise pronominale (<i>Mon père, lui, ne parlait jamais</i>), par le <b>présentatif</b> <i>c\'est… qui / que</i> (<i>C\'est moi qui l\'ai enterré</i>), par <i>ce qui… c\'est</i> ; valeur : insistance, opposition. <b>Personnelle / impersonnelle</b> : <i>il</i> sans référent (<i>il pleut, il faut, il est nécessaire que</i>) ; valeur : objectivité, loi générale, fatalité (<i>il faut que quelqu\'un dise oui</i>).',
+   k:'<b>Repère :</b> type = intonation / ponctuation ; forme = construction. « Ne sortez pas ! » : type injonctif, forme négative.'},
+  {t:'Analyser la phrase pour le sens',
+   p:'Les items demandent de <b>relier</b> type et forme à l\'effet. Une <b>accumulation d\'interrogatives</b> traduit l\'angoisse ou la délibération (le condamné : <i>Et si… ? Que fera-t-on de… ?</i>) ou l\'argumentation (questions rhétoriques de Hugo). Une suite d\'<b>exclamatives</b> et de <b>phrases nominales</b> (<i>Condamné à mort ! Cinq semaines !</i>) crée le pathétique et le rythme haché de l\'émotion. Les <b>injonctives</b> de Créon (<i>Rentre chez toi. Tais-toi.</i>) disent le pouvoir ; celles d\'Antigone (<i>Laisse-moi.</i>) le refus. La <b>négation</b> répétée construit le personnage d\'Antigone (le « non »). La <b>passive sans agent</b> dilue la responsabilité (<i>la sentence a été prononcée</i>). L\'<b>emphase</b> dramatise un contraste. La <b>longueur</b> des phrases compte aussi : phrases courtes = tension, émotion ; longues = description, réflexion.',
+   k:'<b>Formule :</b> « La phrase est interrogative (type) et négative (forme) ; cette question rhétorique traduit la révolte du narrateur contre… ».'},
+  {t:'Exercice corrigé',
+   p:'<b>Phrases (originales) :</b> 1) « Pourquoi ne m\'a-t-on pas laissé dormir ? » 2) « Quelle journée interminable ! » 3) « Qu\'on le fasse entrer. » 4) « La porte fut refermée sans bruit. » 5) « C\'est ma mère qui pleurait, pas moi. » 6) « Il est impossible de fuir. » <b>Corrigé :</b> 1) interrogative partielle, forme négative ; valeur : plainte, reproche. 2) exclamative, affirmative ; valeur : lassitude, pathétique (hyperbole « interminable »). 3) injonctive au subjonctif ; valeur : ordre donné à un tiers, autorité. 4) déclarative, forme passive sans complément d\'agent ; valeur : l\'agent effacé rend la scène mécanique et inquiétante. 5) déclarative, forme emphatique (présentatif « c\'est… qui ») ; valeur : opposition, le narrateur insiste sur son propre courage. 6) déclarative, forme impersonnelle ; valeur : vérité générale, fatalité.',
+   k:'<b>Réflexe :</b> type (ponctuation) + forme (construction) + valeur (émotion / intention).'}
+ ],
+ analyse:[['Déclarative','Énonce ; point final'],['Interrogative','Totale / partielle, directe / indirecte, rhétorique / délibérative'],['Exclamative','Émotion ; que, comme, quel ; phrase nominale'],['Injonctive','Impératif, subjonctif, infinitif, futur, il faut'],['Négative','ne… pas / plus / jamais / rien / personne / que (restriction)'],['Passive','être + participe ; agent par « par »'],['Emphatique','c\'est… qui ; détachement + pronom'],['Impersonnelle','il sans référent : il faut, il pleut']],
+ analyseTitre:'Fiche', analyseCols:['Type / forme','Marques'],
+ citations:'<b>Phrase :</b> 4 types (déclaratif, interrogatif, exclamatif, injonctif) + formes cumulables (négative, passive, emphatique, impersonnelle). Toujours relier à la valeur : révolte, doute, ordre, refus, pathétique.',
+ quiz:[
+  {t:'Type',s:'« Que vais-je devenir ? » est une phrase :',o:['déclarative','interrogative (délibérative)','exclamative','injonctive'],a:1,e:'Le personnage s\'interroge sur son sort.'},
+  {t:'Type',s:'« Qu\'on apporte la lampe. » est de type :',o:['déclaratif','interrogatif','injonctif (subjonctif d\'ordre)','exclamatif'],a:2,e:'Ordre adressé à un tiers.'},
+  {t:'Forme',s:'« Il n\'a plus que deux heures à vivre » contient une négation :',o:['totale','restrictive (ne… que) et partielle (ne… plus)','lexicale','passive'],a:1,e:'« ne… que » = seulement.'},
+  {t:'Forme',s:'« La sentence a été prononcée » est à la forme :',o:['active','passive sans complément d\'agent','emphatique','impersonnelle'],a:1,e:'Le responsable est effacé.'},
+  {t:'Forme',s:'« C\'est toi qui as désobéi » est une phrase :',o:['neutre','emphatique (présentatif)','passive','impersonnelle'],a:1,e:'Mise en relief du sujet.'},
+  {t:'Forme',s:'« Il faut que quelqu\'un dise oui » : « il » est',o:['personnel (Créon)','impersonnel','un pronom de reprise','un article'],a:1,e:'Valeur de loi générale.'},
+  {t:'Valeur',s:'Une suite de phrases nominales exclamatives (« Condamné à mort ! Cinq semaines ! ») produit :',o:['un effet descriptif calme','un rythme haché et pathétique','une argumentation logique','un ordre'],a:1,e:'L\'émotion brise la syntaxe.'},
+  {t:'Rédaction',s:'Donnez le type, la forme et la valeur de chaque phrase : « Ne me parlez plus de grâce. Qui donc pourrait me gracier ? Je suis déjà mort, moi. »',open:true,m:'« Ne me parlez plus de grâce » : phrase injonctive (impératif), forme négative partielle (ne… plus) ; elle exprime un refus las, le condamné repousse un espoir qu\'il juge cruel. « Qui donc pourrait me gracier ? » : interrogative partielle (qui), affirmative, au conditionnel ; c\'est une question rhétorique qui équivaut à « personne ne peut me gracier » et traduit le désespoir. « Je suis déjà mort, moi » : déclarative, forme emphatique par le détachement du pronom « moi » en fin de phrase ; l\'insistance oppose le narrateur aux vivants et crée un paradoxe pathétique (un vivant qui se dit mort). L\'ensemble, par ses phrases brèves, rend le registre tragique et pathétique du passage.'}
+ ]
+});
+})();
+
+addLocked("fr",{"titre":"Les types de textes","sous":"Narratif, descriptif, argumentatif, explicatif, injonctif · indices et intention de communication"});
+addLocked("fr",{"titre":"La phrase complexe","sous":"Propositions, juxtaposition, coordination, subordination · relatives, complétives, circonstancielles, interrogatives indirectes","list":"langue"});
+addLocked("fr",{"titre":"L'énonciation","sous":"Situation d'énonciation, discours / récit, je narrant / je narré, marques de subjectivité, modalisateurs"});
+addLocked("fr",{"titre":"L'expression de la cause, de la conséquence et du but","sous":"Subordonnées, prépositions, adverbes de liaison, modes · nuances (puisque, comme, grâce à, à cause de) · transformations","list":"langue"});
+addLocked("fr",{"titre":"Narrateur et focalisation","sous":"Statut du narrateur, point de vue interne / externe / omniscient, effets sur le lecteur"});
+addLocked("fr",{"titre":"L'expression de l'opposition, de la concession et de l'hypothèse","sous":"Mais, alors que, bien que, malgré, pourtant, quoique · si et la concordance, à condition que, au cas où, à moins que · valeurs","list":"langue"});
+addLocked("fr",{"titre":"Les temps du récit et leurs valeurs","sous":"Passé simple / imparfait, plus-que-parfait, présent de narration et de vérité générale, conditionnel, futur"});
+addLocked("fr",{"titre":"Les connecteurs et la cohérence du texte","sous":"Connecteurs chronologiques, logiques, spatiaux, organisateurs · reprises anaphoriques · progression · ponctuation","list":"langue"});
+addLocked("fr",{"titre":"Le discours rapporté","sous":"Direct, indirect, indirect libre, narrativisé · transformations · effets"});
+addLocked("fr",{"titre":"La modalisation et l'expression de l'opinion","sous":"Modalisateurs de certitude, doute, jugement · verbes d'opinion et leurs modes · le conditionnel · objectivité et subjectivité en rédaction","list":"langue"});
+addLocked("fr",{"titre":"Figures de style (1) : analogie et substitution","sous":"Comparaison, métaphore, personnification, allégorie, métonymie, synecdoque, périphrase · effets"});
+addLocked("fr",{"titre":"Conjugaison : l'indicatif, la concordance des temps, le conditionnel","sous":"Formation des temps simples et composés, passé simple, concordance dans le récit et le discours rapporté, valeurs du conditionnel","list":"langue"});
+addLocked("fr",{"titre":"Figures de style (2) : opposition, amplification, atténuation, insistance","sous":"Antithèse, oxymore, chiasme, antiphrase, hyperbole, gradation, accumulation, litote, euphémisme, anaphore, question rhétorique"});
+addLocked("fr",{"titre":"Le subjonctif, l'impératif et les modes impersonnels","sous":"Formation et emplois du subjonctif, impératif et ses pièges, infinitif, participe présent / adjectif verbal, gérondif","list":"langue"});
+addLocked("fr",{"titre":"Les registres (tonalités)","sous":"Tragique, pathétique, lyrique, ironique, polémique, comique, réaliste, épique, fantastique, didactique · procédés et effets"});
+addLocked("fr",{"titre":"Voix passive, nominalisation, forme pronominale, mise en relief","sous":"Transformation passive et ses effets, nominalisation (titres, résumés), valeurs du verbe pronominal, procédés d'emphase","list":"langue"});
+addLocked("fr",{"titre":"Le lexique : champs lexicaux et connotations","sous":"Champ lexical / sémantique, dénotation / connotation, mélioratif / péjoratif, niveaux de langue, familles de mots, lexique thématique des œuvres"});
+addLocked("fr",{"titre":"Orthographe, accords et ponctuation","sous":"Accord du participe passé, sujet-verbe, adjectifs et noms composés, homophones grammaticaux, ponctuation et majuscules","list":"langue"});
+addLocked("fr",{"titre":"Le texte théâtral","sous":"Lexique du théâtre, didascalies, structure de l'action, tragédie antique et moderne, double énonciation, argumentation dans le dialogue"});
+addLocked("fr",{"titre":"Le texte argumentatif","sous":"Thèse, arguments, exemples, connecteurs, thèse réfutée, convaincre / persuader / délibérer, le roman à thèse"});
+/* === fr/94-productions-demo.js === */
+/* Productions écrites modèles (gratuites) : deux sujets transversaux, plan apparent */
+addRedac('fr',[
+ {t:'1 · La peine de mort : un châtiment juste ou une vengeance ? (plan dialectique)',
+  sujet:'Sujet type régional — « Certains pensent que la peine de mort est nécessaire pour protéger la société des grands criminels. Partagez-vous ce point de vue ? Vous développerez votre réflexion dans un texte argumentatif d\'une vingtaine de lignes, en vous appuyant sur des arguments et des exemples précis. »',
+  paras:[
+   {type:'i',lab:'Introduction · amorce → sujet → problématique → annonce du plan',txt:'De nos jours, chaque crime odieux relance dans l\'opinion publique le débat sur la peine capitale. Nombreux sont ceux qui estiment que seule la mort du criminel peut protéger la société et apaiser les victimes. Mais cette sanction extrême est-elle réellement une justice, ou n\'est-elle qu\'une vengeance déguisée ? Après avoir examiné les raisons de ses partisans, nous montrerons pourquoi elle nous paraît indéfendable, avant de proposer une autre voie.'},
+   {type:'t',lab:'Thèse adverse (concédée) · deux arguments + exemple',txt:'Il est vrai que la peine de mort répond à un besoin de sécurité. Tout d\'abord, ses défenseurs y voient une protection définitive : un meurtrier exécuté ne récidivera jamais, alors qu\'un détenu peut s\'évader ou être libéré. Ensuite, elle passe pour dissuasive : la crainte de l\'échafaud retiendrait, dit-on, la main des criminels. Ainsi, dans certains pays, les autorités justifient son maintien par la lutte contre le trafic de drogue ou le terrorisme.'},
+   {type:'at',lab:'Antithèse · réfutation point par point + exemple littéraire',txt:'Cependant, ces arguments ne résistent pas à l\'examen. En effet, les statistiques des pays abolitionnistes montrent que la criminalité n\'y a pas augmenté : la peur de la mort n\'arrête pas celui qui tue dans la colère ou la misère. De plus, la justice humaine est faillible ; or une erreur judiciaire est irréparable quand le condamné a été exécuté. Par ailleurs, comme le montre Victor Hugo dans Le Dernier Jour d\'un condamné, cette peine inflige une torture morale insoutenable : le narrateur, enfermé avec sa pensée pendant cinq semaines, meurt mille fois avant l\'heure, et sa fille Marie est punie avec lui. Enfin, une société qui tue froidement, à heure fixe, devant la foule, ne fait que reproduire la violence qu\'elle prétend combattre : elle se venge, elle ne juge pas.'},
+   {type:'c',lab:'Conclusion · bilan → avis → ouverture',txt:'En somme, si la peine de mort rassure, elle ne protège ni ne dissuade, et elle avilit ceux qui l\'appliquent. À mon sens, une justice digne de ce nom doit punir sans tuer : la détention longue et la réinsertion protègent mieux la société qu\'un cadavre de plus. Finalement, la véritable question n\'est-elle pas de savoir quelle société nous voulons être ?'}
+  ]},
+ {t:'2 · Faut-il renoncer à ses idéaux pour être heureux ? (Antigone · plan dialectique)',
+  sujet:'Sujet type régional — « Créon affirme à Antigone que la vie n\'est qu\'un bonheur modeste fait de compromis, et qu\'il faut savoir dire oui. Pensez-vous qu\'il faille renoncer à ses idéaux pour être heureux ? Répondez dans un texte argumentatif organisé d\'une vingtaine de lignes. »',
+  paras:[
+   {type:'i',lab:'Introduction · amorce → reformulation → problématique → plan',txt:'Il est fréquent de constater que les adultes conseillent aux jeunes d\'être « raisonnables » et de modérer leurs ambitions. C\'est la leçon que Créon, dans Antigone de Jean Anouilh, tente d\'inculquer à sa nièce : le bonheur serait fait de petits renoncements. La question se pose de savoir si l\'on doit sacrifier ses idéaux pour vivre heureux. Nous verrons que le compromis a ses vertus, mais qu\'une vie sans exigence perd son sens, avant de chercher un équilibre.'},
+   {type:'t',lab:'Thèse · le compromis est nécessaire (2 arguments + exemple)',txt:'D\'abord, il faut reconnaître que le compromis est la condition de toute vie en société. Nul ne peut imposer ses convictions aux autres sans violence ; accepter de céder sur certains points, c\'est respecter autrui. Ensuite, l\'intransigeance mène souvent au malheur : à vouloir tout, tout de suite, on finit par ne rien obtenir. Ainsi, Créon n\'a pas tort lorsqu\'il décrit le bonheur simple d\'un métier, d\'une maison, d\'un enfant qui joue : bien des gens trouvent là une paix réelle.'},
+   {type:'at',lab:'Antithèse · sans idéal, pas de dignité (2 arguments + exemples)',txt:'Toutefois, un bonheur acheté au prix de ses principes n\'est qu\'une résignation. En effet, l\'homme ne se distingue pas par sa capacité à s\'adapter mais par celle de dire non à l\'injustice : les grandes avancées de l\'humanité, de l\'abolition de l\'esclavage à l\'indépendance des peuples, sont nées de refus jugés déraisonnables. De plus, renoncer à ce que l\'on croit juste, c\'est se trahir soi-même ; Antigone le sait, qui préfère mourir plutôt que d\'accepter une vie « qu\'il faudrait aimer » à genoux. Par ailleurs, l\'histoire du Maroc offre l\'exemple de résistants qui ont refusé le confort du compromis au nom de la liberté.'},
+   {type:'c',lab:'Conclusion · synthèse → avis nuancé → ouverture',txt:'Pour conclure, le compromis est une sagesse dans les petites choses et une lâcheté dans les grandes. Il me semble que le bonheur véritable ne consiste ni à tout refuser comme Antigone ni à tout accepter comme Créon, mais à savoir sur quoi l\'on ne cédera jamais. Finalement, n\'est-ce pas cette ligne, propre à chacun, qui donne un sens à une vie ?'}
+  ]}
+]);
+
 /* === hg/00-oeuvre.js === */
 /* الاجتماعيات — الأولى بكالوريا، الشعب العلمية والتقنية — المنهجية العامة */
 var HGD=(function(){
@@ -1810,7 +2050,7 @@ addRedac('is',[
 </script>
 <script>
 /* ===================== MOTEUR ===================== */
-var API='https://jihawi-api.synergieinfra.workers.dev',FREE_CH=1,PAID_V='c71447b9';
+var API='https://jihawi-api.synergieinfra.workers.dev',FREE_CH=1,PAID_V='f78abe6a';
 var S={oeuvre:null,view:'home',chap:null,list:'chapitres',hist:[],answers:{},exam:null,full:false,lic:null};
 var $=function(id){return document.getElementById(id)};
 function store(k,v){try{localStorage.setItem('bp_'+k,JSON.stringify(v));}catch(e){}}
@@ -1881,17 +2121,19 @@ function hiliteConn(t){var o=cur();if(o&&o.rtl){CONN_AR.forEach(function(c){var 
 function renderHome(m){
   setTitle('Jihawi Prépa','1ʳᵉ année bac · Examen régional');
   var h='<div class="install" id="install"><img src="icon-192.png" alt=""><div class="t"><b>Installer l\'application</b>Icône sur l\'écran d\'accueil, fonctionne hors connexion.</div><button class="ok" onclick="doInstall()">Installer</button><button class="no" onclick="hideInstall(true)">✕</button></div>';
-  h+='<div class="card"><h2>Choisissez une œuvre</h2><p class="tip">Les trois œuvres au programme de la 1ʳᵉ année bac. L\'œuvre tombée à l\'examen varie selon l\'académie : révisez les trois.</p><div class="oeuvres">';
+  h+='<div class="card"><h2>Choisissez un module</h2><p class="tip">Tout le programme de la 1ʳᵉ année bac pour l\'examen régional : les trois œuvres de français et l\'épreuve elle-même (analyse, langue, production écrite), puis les matières en arabe.</p><div class="oeuvres">';
   var ids=['bam','antigone','ddc'];
   var meta={bam:{t:'La Boîte à merveilles',a:'Ahmed Sefrioui · roman autobiographique',c:'linear-gradient(135deg,#b5452c,#d9a441)'},
             antigone:{t:'Antigone',a:'Jean Anouilh · tragédie moderne',c:'linear-gradient(135deg,#1f6f78,#2b2118)'},
             ddc:{t:'Le Dernier Jour d\'un condamné',a:'Victor Hugo · roman à thèse',c:'linear-gradient(135deg,#4a3b5c,#8a6d3b)'},
+            fr:{t:'Épreuve de français',a:'Référentiel · outils d\'analyse · langue · production écrite',c:'linear-gradient(135deg,#2b2118,#1f6f78)'},
             ar:{t:'اللغة العربية',a:'الشعب العلمية والتقنية · النصوص، علوم اللغة، التعبير والإنشاء',c:'linear-gradient(135deg,#0f5e4a,#1f8a6a)',rtl:true},
             hg:{t:'الاجتماعيات',a:'الشعب العلمية والتقنية · التاريخ والجغرافيا',c:'linear-gradient(135deg,#6b3f1d,#b5452c)',rtl:true},
             is:{t:'التربية الإسلامية',a:'جميع الشعب · التزكية، الاقتداء، الاستجابة، القسط، الحكمة',c:'linear-gradient(135deg,#1f4f78,#2b7a8a)',rtl:true}};
   var card=function(id){var ok=!!BAM.oeuvres[id],x=meta[id];
     return '<button class="oeuvre'+(ok?'':' soon')+'" style="background:'+x.c+(x.rtl?';direction:rtl;text-align:right':'')+'" '+(ok?'onclick="openOeuvre(\''+id+'\')"':'disabled')+'><b>'+x.t+'</b><small>'+x.a+'</small>'+(ok?'':'<span class="ribbon">'+(x.rtl?'قريبا':'BIENTÔT')+'</span>')+'</button>';};
-  h+='<p class="mat">Français</p>';ids.forEach(function(id){h+=card(id);});
+  h+='<p class="mat">Français · 1. Les œuvres au programme</p>';ids.forEach(function(id){h+=card(id);});
+  h+='<p class="mat">Français · 2. L\'épreuve : analyse, langue, production écrite</p>'+card('fr');
   h+='<p class="mat">المواد بالعربية</p>'+card('ar')+card('hg')+card('is');
   h+='</div></div>';
   var p=load('prog',{}),tot=0,done=0;
@@ -2077,7 +2319,7 @@ function renderChap(m,o,c){
 /* ---------- traduction arabe ---------- */
 function strip(h){return String(h).replace(/<[^>]+>/g,'');}
 function arBtn(id,ar,fr,after){
-  var bid='ar_'+id;
+  var bid='ar_'+id;var oo=cur();if(!ar&&oo&&oo.noTrad)return '';
   if(ar){return '<button class="arbtn" onclick="toggleAr(this,\''+bid+'\')">🇲🇦 ترجمة · Traduire en arabe</button><div class="ar" id="'+bid+'">'+ar+'</div>';}
   var url='https://translate.google.com/?sl=fr&tl=ar&op=translate&text='+encodeURIComponent(strip(fr).slice(0,1500));
   return '<a class="arbtn" href="'+url+'" target="_blank" rel="noopener">🇲🇦 Traduire en arabe (en ligne)</a>';
