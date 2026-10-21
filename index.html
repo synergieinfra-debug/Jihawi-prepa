@@ -2076,17 +2076,18 @@ document.querySelectorAll('nav button').forEach(function(b){b.addEventListener('
 /* ---------- textes d'interface (français par défaut ; une matière peut fournir o.ui) ---------- */
 var UI_FR={cours:'Cours',entr:'Entraînement',chrono:'Chronologie',outils:'Outils d\'analyse sur ce chapitre',notion:'Notion',dansCh:'Dans ce chapitre',retenir:'À retenir pour l\'examen',passer:'Passer à l\'entraînement →',recommencer:'Recommencer',suivant:'Chapitre suivant →',locked:'version<br>complète',debloquer:'Débloquer tous les chapitres',listTip:'Chaque chapitre : résumé illustré, points clés, puis entraînement type régional.',dernier:'dernier score',afaire:'à faire',placeholder:'Rédigez votre réponse…',voirCorrige:'Voir le corrigé modèle',corrige:'Corrigé modèle :',nonAcquis:'Non acquis',partiel:'Partiel',acquis:'Acquis',explication:'Explication :',score:'Score : ',repondues:' répondues',note:'Note : ',examTitle:'Examen blanc',examTip:'10 questions tirées au sort dans tous les chapitres, 20 minutes, note sur 20. Comme le jour J : pas de retour en arrière.',qcm:'QCM chronométré',flash:'Flashcards',flashTip:'Touchez la carte pour la retourner.',lancer:'Lancer un examen blanc',carteSuiv:'Carte suivante →',definissez:'Définissez',temps:'Temps restant : ',termine:'Terminé',redacTitle:'Rédactions modèles',redacTip:'Une rédaction complète par thème, au format attendu le jour de l\'examen (15 à 20 lignes). Touchez un titre pour l\'ouvrir. Les connecteurs sont surlignés.',sujet:'Sujet :',labels:{i:'Introduction',a:'Argument',c:'Conclusion',t:'Thèse',at:'Antithèse'},persos:'Les personnages',persosTip:'Touchez une carte pour voir le détail. À l\'examen : « présentez ce personnage en 2-3 phrases ».',schema:'Schéma des relations',licence:'usage personnel'};
 function T(k){var o=cur();return (o&&o.ui&&o.ui[k]!==undefined)?o.ui[k]:UI_FR[k];}
-function setDir(o){var rtl=!!(o&&o.rtl&&S.view!=='home'&&S.view!=='licence'&&S.view!=='admin');document.documentElement.dir=rtl?'rtl':'ltr';document.documentElement.lang=rtl?'ar':'fr';document.body.classList.toggle('rtl',rtl);}
+function setDir(o){var rtl=!!(o&&o.rtl&&S.view!=='home'&&S.view!=='francais'&&S.view!=='licence'&&S.view!=='admin');document.documentElement.dir=rtl?'rtl':'ltr';document.documentElement.lang=rtl?'ar':'fr';document.body.classList.toggle('rtl',rtl);}
 function chapList(o){return S.list==='langue'?(o.langue||[]):o.chapitres;}
 function progKey(o,i){return o.id+(S.list==='langue'?'_L':'_')+i;}
 function render(){
   var m=$('main');setDir(cur());
-  var oo=cur(),nv=(oo&&oo.nav)||{};document.querySelectorAll('nav button').forEach(function(b){var v=b.dataset.v;var on=v===S.view||(S.view==='chap'&&((S.list==='langue'&&v==='persos')||(S.list!=='langue'&&v==='chapitres')));b.classList.toggle('on',on);if(v!=='home'){var l=b.querySelector('span.l');if(l)l.textContent=(S.view!=='home'&&nv[v])||l.dataset.fr;}});
+  var oo=cur(),nv=(oo&&oo.nav)||{};document.querySelectorAll('nav button').forEach(function(b){var v=b.dataset.v;var on=v===S.view||(S.view==='chap'&&((S.list==='langue'&&v==='persos')||(S.list!=='langue'&&v==='chapitres')));b.classList.toggle('on',on);if(v!=='home'){var l=b.querySelector('span.l');if(l)l.textContent=(S.view!=='home'&&S.view!=='francais'&&nv[v])||l.dataset.fr;}});
   $('back').classList.toggle('show',S.hist.length>0);
   var o=cur();
   if(S.view==='home')return renderHome(m);
   if(S.view==='licence')return renderLicence(m);
   if(S.view==='admin')return renderAdmin(m);
+  if(S.view==='francais')return renderFrancais(m);
   if(!o)return renderHome(m);
   setTitle(o.titre,o.auteur+' · '+o.genre);
   if(S.view==='oeuvre')m.innerHTML=o.fiche;
@@ -2118,23 +2119,29 @@ var CONN_AR=['أولا','ثانيا','ثالثا','بداية','في البدا�
 function hiliteConn(t){var o=cur();if(o&&o.rtl){CONN_AR.forEach(function(c){var re=new RegExp('(^|[\\s(«])('+c+')(?=[\\s،,;:.!؟»)])','g');t=t.replace(re,'$1<mark class="conn">$2</mark>');});return t;}CONN.forEach(function(c){var re=new RegExp('(^|[\\s(«])('+c.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')(?=[\\s,;:.!?»)])','g');t=t.replace(re,'$1<mark class="conn">$2</mark>');});return t;}
 
 /* ---------- accueil ---------- */
-function renderHome(m){
-  setTitle('Jihawi Prépa','1ʳᵉ année bac · Examen régional');
-  var h='<div class="install" id="install"><img src="icon-192.png" alt=""><div class="t"><b>Installer l\'application</b>Icône sur l\'écran d\'accueil, fonctionne hors connexion.</div><button class="ok" onclick="doInstall()">Installer</button><button class="no" onclick="hideInstall(true)">✕</button></div>';
-  h+='<div class="card"><h2>Choisissez un module</h2><p class="tip">Tout le programme de la 1ʳᵉ année bac pour l\'examen régional : les trois œuvres de français et l\'épreuve elle-même (analyse, langue, production écrite), puis les matières en arabe.</p><div class="oeuvres">';
-  var ids=['bam','antigone','ddc'];
-  var meta={bam:{t:'La Boîte à merveilles',a:'Ahmed Sefrioui · roman autobiographique',c:'linear-gradient(135deg,#b5452c,#d9a441)'},
+var MOD_META={bam:{t:'La Boîte à merveilles',a:'Ahmed Sefrioui · roman autobiographique',c:'linear-gradient(135deg,#b5452c,#d9a441)'},
             antigone:{t:'Antigone',a:'Jean Anouilh · tragédie moderne',c:'linear-gradient(135deg,#1f6f78,#2b2118)'},
             ddc:{t:'Le Dernier Jour d\'un condamné',a:'Victor Hugo · roman à thèse',c:'linear-gradient(135deg,#4a3b5c,#8a6d3b)'},
+            francais:{t:'Français',a:'Les trois œuvres au programme · l\'épreuve : analyse, langue, production écrite',c:'linear-gradient(135deg,#b5452c,#2b2118)'},
             fr:{t:'Épreuve de français',a:'Référentiel · outils d\'analyse · langue · production écrite',c:'linear-gradient(135deg,#2b2118,#1f6f78)'},
             ar:{t:'اللغة العربية',a:'الشعب العلمية والتقنية · النصوص، علوم اللغة، التعبير والإنشاء',c:'linear-gradient(135deg,#0f5e4a,#1f8a6a)',rtl:true},
             hg:{t:'الاجتماعيات',a:'الشعب العلمية والتقنية · التاريخ والجغرافيا',c:'linear-gradient(135deg,#6b3f1d,#b5452c)',rtl:true},
             is:{t:'التربية الإسلامية',a:'جميع الشعب · التزكية، الاقتداء، الاستجابة، القسط، الحكمة',c:'linear-gradient(135deg,#1f4f78,#2b7a8a)',rtl:true}};
-  var card=function(id){var ok=!!BAM.oeuvres[id],x=meta[id];
-    return '<button class="oeuvre'+(ok?'':' soon')+'" style="background:'+x.c+(x.rtl?';direction:rtl;text-align:right':'')+'" '+(ok?'onclick="openOeuvre(\''+id+'\')"':'disabled')+'><b>'+x.t+'</b><small>'+x.a+'</small>'+(ok?'':'<span class="ribbon">'+(x.rtl?'قريبا':'BIENTÔT')+'</span>')+'</button>';};
-  h+='<p class="mat">Français · 1. Les œuvres au programme</p>';ids.forEach(function(id){h+=card(id);});
-  h+='<p class="mat">Français · 2. L\'épreuve : analyse, langue, production écrite</p>'+card('fr');
-  h+='<p class="mat">المواد بالعربية</p>'+card('ar')+card('hg')+card('is');
+function modCard(id){var x=MOD_META[id];if(id==='francais'){return '<button class="oeuvre" style="background:'+x.c+'" onclick="go(\'francais\')"><b>'+x.t+'</b><small>'+x.a+'</small></button>';}var ok=!!BAM.oeuvres[id];
+    return '<button class="oeuvre'+(ok?'':' soon')+'" style="background:'+x.c+(x.rtl?';direction:rtl;text-align:right':'')+'" '+(ok?'onclick="openOeuvre(\''+id+'\')"':'disabled')+'><b>'+x.t+'</b><small>'+x.a+'</small>'+(ok?'':'<span class="ribbon">'+(x.rtl?'قريبا':'BIENTÔT')+'</span>')+'</button>';}
+function renderFrancais(m){
+  setTitle('Français','1ʳᵉ année bac · Examen régional');
+  var h='<div class="card"><h2>Français</h2><p class="tip">L\'examen régional porte sur les trois œuvres au programme (étude de texte) et sur l\'épreuve elle-même : outils d\'analyse, langue et production écrite.</p><div class="oeuvres">';
+  h+='<p class="mat">1. Les œuvres au programme</p>'+modCard('bam')+modCard('antigone')+modCard('ddc');
+  h+='<p class="mat">2. L\'épreuve : analyse, langue, production écrite</p>'+modCard('fr');
+  h+='</div></div>';m.innerHTML=h;
+}
+function renderHome(m){
+  setTitle('Jihawi Prépa','1ʳᵉ année bac · Examen régional');
+  var h='<div class="install" id="install"><img src="icon-192.png" alt=""><div class="t"><b>Installer l\'application</b>Icône sur l\'écran d\'accueil, fonctionne hors connexion.</div><button class="ok" onclick="doInstall()">Installer</button><button class="no" onclick="hideInstall(true)">✕</button></div>';
+  h+='<div class="card"><h2>Choisissez une matière</h2><p class="tip">Tout le programme de la 1ʳᵉ année bac pour l\'examen régional, matière par matière.</p><div class="oeuvres">';
+  h+='<p class="mat">Français</p>'+modCard('francais');
+  h+='<p class="mat">المواد بالعربية</p>'+modCard('ar')+modCard('hg')+modCard('is');
   h+='</div></div>';
   var p=load('prog',{}),tot=0,done=0;
   Object.keys(BAM.oeuvres).forEach(function(id){BAM.oeuvres[id].chapitres.forEach(function(c,i){tot++;if(p[id+'_'+i])done++;});});
@@ -2278,7 +2285,8 @@ if('serviceWorker' in navigator&&location.protocol!=='file:'&&!BAM.preview){
     }).catch(function(){});
   });
 }
-function openOeuvre(id){S.oeuvre=id;S.hist=[];store('last',id);go('oeuvre',null,true);}
+var FR_IDS={bam:1,antigone:1,ddc:1,fr:1};
+function openOeuvre(id){S.oeuvre=id;S.hist=[{view:'home'}];if(FR_IDS[id])S.hist.push({view:'francais'});store('last',id);go('oeuvre',null,true);}
 
 /* ---------- chapitres ---------- */
 function renderChapList(m,o){
