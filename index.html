@@ -69,7 +69,7 @@ nav button.on{color:var(--accent)}
 .admg{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}.admg .lab{display:block}.admg .inp{margin-top:2px}
 .adc,.adl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0;border-top:1px solid #eadfcf}.adc:first-child,.adl:first-child{border-top:0}
 .adc code,.adl code{font-size:1rem;font-weight:700;letter-spacing:.5px}.adl>div:first-child{flex:1;min-width:170px}.adl .acts{display:flex;gap:6px;flex-wrap:wrap}
-.adl .btn,.adc .btn{padding:6px 10px;font-size:.8rem;margin:0}.btn.wa{background:#25d366;color:#fff;text-decoration:none;display:inline-block}.btn.wa.w{display:block;text-align:center;padding:11px 14px;font-size:1rem;margin-top:10px}.btn.red{color:#b5452c;border-color:#b5452c}
+.adl .btn,.adc .btn{padding:6px 10px;font-size:.8rem;margin:0}.asg{display:flex;gap:6px;margin-top:4px;width:100%}.asg .inp{flex:1;min-width:0;margin:0;padding:6px 8px;font-size:.85rem;text-transform:none;letter-spacing:0}.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.chip{border:1px solid #d9ccb8;background:#fff;border-radius:999px;padding:4px 10px;font-size:.75rem;font-family:inherit}.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}.btn.wa{background:#25d366;color:#fff;text-decoration:none;display:inline-block}.btn.wa.w{display:block;text-align:center;padding:11px 14px;font-size:1rem;margin-top:10px}.btn.red{color:#b5452c;border-color:#b5452c}
 .st{font-size:.75rem;padding:2px 7px;border-radius:9px;background:#eee;color:#555;margin-left:4px}.st.on{background:#dff3e4;color:#1d6b3a}.st.off{background:#f9dcd6;color:#9b2f1a}
 .btn.ghost{background:none;color:var(--accent);border:1px solid var(--accent)}
 .btn.w{width:100%}
@@ -2223,7 +2223,14 @@ function adminLogin(){
 function adminLogout(){if(confirm('Retirer l\'accès administrateur de cet appareil ?')){store('adm',null);S.hist=[];go('home',null,true);}}
 function appUrl(){return location.origin+location.pathname.replace(/index\.html$/,'');}
 function waMsg(code,nom){return 'Bonjour'+(nom?' '+nom:'')+' 👋\nVoici votre code *Jihawi Prépa* (1ʳᵉ bac · tous les modules) :\n\n*'+code+'*\n\n1) Ouvrez '+appUrl()+'\n2) Touchez « J\'ai un code · Activer », saisissez le code et votre prénom.\n3) Installez l\'application (menu ⋮ → Ajouter à l\'écran d\'accueil) : elle fonctionne ensuite hors connexion.\n\nValable toute l\'année scolaire, sur 2 appareils maximum. Bonne révision !';}
-function waLink(code,nom){var t=encodeURIComponent(waMsg(code,nom));if(/Android/i.test(navigator.userAgent))return 'intent://send?text='+t+'#Intent;scheme=whatsapp;package=com.whatsapp;S.browser_fallback_url='+encodeURIComponent('https://wa.me/?text='+t)+';end';return 'https://wa.me/?text='+t;}
+function normTel(t){t=String(t||'').replace(/[^0-9+]/g,'');if(t.indexOf('+')===0)t=t.slice(1);if(/^0[5-7]\d{8}$/.test(t))t='212'+t.slice(1);if(/^[5-7]\d{8}$/.test(t))t='212'+t;return /^\d{10,15}$/.test(t)?t:'';}
+function waLink(code,nom,tel){var t=encodeURIComponent(waMsg(code,nom)),ph=normTel(tel),fb='https://wa.me/'+ph+'?text='+t;if(/Android/i.test(navigator.userAgent))return 'intent://send?'+(ph?'phone='+ph+'&':'')+'text='+t+'#Intent;scheme=whatsapp;package=com.whatsapp;S.browser_fallback_url='+encodeURIComponent(fb)+';end';return fb;}
+function adminSend(code,el){var box=el.closest('.adc,.adl'),nom=box.querySelector('.anom').value.trim(),tel=box.querySelector('.atel').value.trim();
+  if(tel&&!normTel(tel)){alert('Numéro WhatsApp invalide (ex. 0661996001)');return;}
+  admPost('/admin/assign',{code:code,nom:nom,tel:normTel(tel),sent:true}).then(function(){adminList();}).catch(function(){});
+  window.open(waLink(code,nom,tel),'_blank');}
+function adminPaye(code,v){admPost('/admin/assign',{code:code,paye:v}).then(function(j){if(j.ok)adminList();else alert(j.error||'Erreur');}).catch(function(){alert('Serveur injoignable');});}
+function assignInputs(l){return '<div class="asg"><input class="inp anom" placeholder="Nom de l\'élève" value="'+esc(l.nom||'')+'" maxlength="60"><input class="inp atel" placeholder="WhatsApp (06…)" inputmode="tel" value="'+esc(l.tel||'')+'" maxlength="20"></div>';}
 function copyTxt(t,btn){var done=function(){if(btn){var o=btn.textContent;btn.textContent='Copié ✓';setTimeout(function(){btn.textContent=o;},1200);}};
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){prompt('Copiez :',t);});else prompt('Copiez :',t);}
 function renderAdmin(m){
@@ -2235,11 +2242,11 @@ function renderAdmin(m){
    +'<label class="lab">Jours<input id="adJ" class="inp" type="number" value="365" min="7" max="730"></label>'
    +'<label class="lab">Lot<input id="adLot" class="inp" value="'+lot+'" maxlength="20"></label></div>'
    +'<button class="btn w" id="adGen" onclick="adminGen()">Générer</button><div id="adMsg" class="tip" style="margin-top:8px"></div><div id="adNew"></div></div>'
-   +'<div class="card"><h2>Licences <span id="adCount" class="tip"></span></h2><div class="row"><input id="adQ" class="inp" placeholder="Rechercher (code, nom, lot)" oninput="adminFilter()" style="flex:1;margin:0"><button class="btn ghost" onclick="adminList()">Actualiser</button></div><div id="adList" class="tip" style="margin-top:8px">Chargement…</div></div>'
+   +'<div class="card"><h2>Licences <span id="adCount" class="tip"></span></h2><div class="row"><input id="adQ" class="inp" placeholder="Rechercher (code, nom, lot)" oninput="adminFilter()" style="flex:1;margin:0"><button class="btn ghost" onclick="adminList()">Actualiser</button></div><div id="adChips" class="chips"></div><div id="adList" class="tip" style="margin-top:8px">Chargement…</div></div>'
    +'<div class="card"><button class="btn ghost w" onclick="adminLogout()">Quitter l\'administration</button></div>';
   adminList();
 }
-function codeRow(c,nom){return '<div class="adc"><code>'+c+'</code><a class="btn wa" href="'+waLink(c,nom)+'" target="_blank" rel="noopener">WhatsApp</a><button class="btn ghost" onclick="copyTxt(\''+c+'\',this)">Copier</button></div>';}
+function codeRow(c,nom){return '<div class="adc"><code>'+c+'</code>'+assignInputs({nom:nom})+'<button class="btn wa" onclick="adminSend(\''+c+'\',this)">Envoyer sur WhatsApp</button><button class="btn ghost" onclick="copyTxt(\''+c+'\',this)">Copier</button></div>';}
 function adminGen(){
   var n=+$('adN').value||1,btn=$('adGen'),msg=$('adMsg');btn.disabled=true;msg.textContent='Génération…';
   admPost('/admin/codes',{n:n,max:+$('adMax').value||2,jours:+$('adJ').value||365,lot:$('adLot').value.trim()}).then(function(j){
@@ -2254,17 +2261,22 @@ function adminList(){var el=$('adList');if(!el)return;el.textContent='Chargement
   admPost('/admin/list').then(function(j){if(!Array.isArray(j)){el.textContent='✗ '+(j.error||'Erreur');return;}_adAll=j;adminFilter();}).catch(function(){el.textContent='✗ Serveur injoignable';});}
 function adminFilter(){
   var q=($('adQ').value||'').toLowerCase(),el=$('adList');var L=_adAll.filter(function(l){return !q||(l.code+' '+(l.nom||'')+' '+(l.lot||'')).toLowerCase().indexOf(q)>=0;});
-  var act=_adAll.filter(function(l){return l.active&&!l.revoked;}).length;$('adCount').textContent=_adAll.length+' codes · '+act+' actifs';
+  var f=window._adF||'tous';L=L.filter(function(l){if(f==='impayes')return !l.paye&&(l.sentAt||l.active)&&!l.revoked;if(f==='actifs')return l.active&&!l.revoked;if(f==='off')return l.revoked;if(f==='libres')return !l.sentAt&&!l.active&&!l.revoked;return true;});
+  var act=_adAll.filter(function(l){return l.active&&!l.revoked;}).length,imp=_adAll.filter(function(l){return !l.paye&&(l.sentAt||l.active)&&!l.revoked;}).length;$('adCount').textContent=_adAll.length+' codes · '+act+' actifs · '+imp+' impayé(s)';
+  var chips=[['tous','Tous'],['impayes','Impayés'],['actifs','Actifs'],['libres','Non envoyés'],['off','Désactivés']].map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" onclick="_adF=\''+c[0]+'\';adminFilter()">'+c[1]+'</button>';}).join('');
+  var fe=$('adChips');if(fe)fe.innerHTML=chips;
   if(!L.length){el.innerHTML='Aucun code.';return;}
   L.sort(function(a,b){return (b.created||0)-(a.created||0);});
   el.innerHTML=L.map(function(l){
     var etat=l.revoked?'<span class="st off">désactivé</span>':l.active?'<span class="st on">actif · '+l.appareils+'/'+l.max+'</span>':'<span class="st">non utilisé</span>';
     var exp=l.exp?' · exp. '+new Date(l.exp).toLocaleDateString('fr-MA'):'';
-    var acts=(!l.active&&!l.revoked?'<a class="btn wa" href="'+waLink(l.code,'')+'" target="_blank" rel="noopener">WhatsApp</a>':'')
+    var paye=l.revoked?'':(l.paye?'<button class="btn ghost" onclick="adminPaye(\''+l.code+'\',false)" title="Marquer non payé">Payé ✓</button>':'<button class="btn ghost red" onclick="adminPaye(\''+l.code+'\',true)">Non payé → marquer payé</button>');
+    var acts=(!l.revoked?'<button class="btn wa" onclick="adminSend(\''+l.code+'\',this)">'+(l.sentAt?'Renvoyer':'Envoyer')+' WhatsApp</button>':'')+paye
       +'<button class="btn ghost" onclick="copyTxt(\''+l.code+'\',this)">Copier</button>'
       +(l.active?'<button class="btn ghost" onclick="adminAct(\'reset\',\''+l.code+'\')">Libérer appareils</button>':'')
       +(l.revoked?'<button class="btn ghost" onclick="adminAct(\'unrevoke\',\''+l.code+'\')">Réactiver</button>':'<button class="btn ghost red" onclick="adminAct(\'revoke\',\''+l.code+'\')">Désactiver</button>');
-    return '<div class="adl"><div><code>'+l.code+'</code> '+etat+'<br><small>'+esc(l.nom||'—')+' · lot '+esc(l.lot||'—')+exp+'</small></div><div class="acts">'+acts+'</div></div>';
+    var sent=l.sentAt?' · envoyé le '+new Date(l.sentAt).toLocaleDateString('fr-MA'):'';var pay=l.revoked?'':(l.paye?' · <b style="color:#2b7a4b">payé</b>':' · <b style="color:#b5452c">non payé</b>');
+    return '<div class="adl"><div><code>'+l.code+'</code> '+etat+'<br><small>lot '+esc(l.lot||'—')+exp+sent+pay+'</small>'+(l.revoked?'<small>'+esc(l.nom||'—')+' · '+esc(l.tel||'—')+'</small>':assignInputs(l))+'</div><div class="acts">'+acts+'</div></div>';
   }).join('');
 }
 function adminAct(a,code){
