@@ -2142,10 +2142,15 @@ function renderAdmin(m){
    +'<label class="lab">Lot<input id="adLot" class="inp" value="'+lot+'" maxlength="20"></label></div>'
    +'<button class="btn w" id="adGen" onclick="adminGen()">Générer</button><div id="adMsg" class="tip" style="margin-top:8px"></div><div id="adNew"></div></div>'
    +'<div class="card"><h2>Licences <span id="adCount" class="tip"></span></h2><div class="row"><input id="adQ" class="inp" placeholder="Rechercher (code, nom, lot)" oninput="adminFilter()" style="flex:1;margin:0"><button class="btn ghost" onclick="adminList()">Actualiser</button></div><div id="adChips" class="chips"></div><div id="adList" class="tip" style="margin-top:8px">Chargement…</div></div>'
+   +'<div class="card"><h2>Démo · utilisations</h2><div id="adStat" class="tip">Chargement…</div><button class="btn ghost" onclick="adminStats()">Actualiser</button></div>'
    +'<div class="card"><h2>Lien de la démo</h2><p class="tip">À partager avec les élèves : ils découvrent les premières leçons gratuitement et demandent leur code sur WhatsApp.</p><code id="adUrl" style="display:block;word-break:break-all;font-size:.9rem;margin:6px 0 10px">'+appUrl()+'</code><div class="row"><button class="btn w" onclick="copyTxt(appUrl(),this)" style="margin:0;flex:1">Copier le lien</button><a class="btn wa" style="flex:1;text-align:center;margin:0;padding:11px" href="https://wa.me/?text='+encodeURIComponent('🎓 Jihawi Prépa — 1ʳᵉ bac, examen régional : Français, العربية, الاجتماعيات, التربية الإسلامية. Leçons illustrées + questions au format exact de l\'examen, corrigées. Fonctionne hors connexion.\n\n👉 Démo gratuite : '+appUrl()+'\n💬 Code d\'activation (149 DH, toute l\'année) : WhatsApp 06 61 99 60 01')+'" target="_blank" rel="noopener">Partager sur WhatsApp</a></div></div>'
    +'<div class="card"><button class="btn ghost w" onclick="adminLogout()">Quitter l\'administration</button></div>';
-  adminList();
+  adminList();adminStats();
 }
+function adminStats(){var el=$('adStat');if(!el)return;admPost('/admin/stats',{}).then(function(j){if(!j.jours){el.textContent='✗ '+(j.error||'Erreur');return;}
+  var h='<p><b style="font-size:1.6rem;color:#1f6f78">'+j.total+'</b> appareil(s) ont ouvert la démo au moins une fois</p><table><tr><th>Jour</th><th>Nouveaux appareils</th></tr>';
+  j.jours.slice(0,14).forEach(function(x){h+='<tr><td>'+x.date+'</td><td>'+x.n+'</td></tr>';});
+  el.innerHTML=h+'</table>';}).catch(function(){el.textContent='✗ Serveur injoignable';});}
 function codeRow(c,nom){return '<div class="adc"><code>'+c+'</code>'+assignInputs({nom:nom})+'<button class="btn wa" onclick="adminSend(\''+c+'\',this)">Envoyer sur WhatsApp</button><button class="btn ghost" onclick="copyTxt(\''+c+'\',this)">Copier</button></div>';}
 function adminGen(){
   var n=+$('adN').value||1,btn=$('adGen'),msg=$('adMsg');btn.disabled=true;msg.textContent='Génération…';
@@ -2327,7 +2332,13 @@ function flipCard(){showCard(!FB);}
 function nextCard(){FI=(FI+1)%FC.length;showCard(false);}
 
 /* ---------- init ---------- */
-(function(){initLicence();var last=load('last',null);if(last&&BAM.oeuvres[last]){S.oeuvre=last;}go('home',null,true);})();
+function pingDemo(){
+  if(BAM.preview||S.full||!navigator.onLine||load('uidSent',false))return;
+  var id=load('uid',null);
+  if(!id){id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():('u'+Date.now().toString(36)+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2));store('uid',id);}
+  fetch(API+'/stat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id:id})}).then(function(r){if(r.ok)store('uidSent',true);}).catch(function(){});
+}
+(function(){initLicence();pingDemo();var last=load('last',null);if(last&&BAM.oeuvres[last]){S.oeuvre=last;}go('home',null,true);})();
 </script>
 </body>
 </html>
