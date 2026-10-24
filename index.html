@@ -2147,8 +2147,8 @@ function renderAdmin(m){
    +'<div class="card"><button class="btn ghost w" onclick="adminLogout()">Quitter l\'administration</button></div>';
   adminList();adminStats();
 }
-function adminStats(){var el=$('adStat');if(!el)return;admPost('/admin/stats',{}).then(function(j){if(!j.jours){el.textContent='✗ '+(j.error||'Erreur');return;}
-  var h='<p><b style="font-size:1.6rem;color:#1f6f78">'+j.total+'</b> appareil(s) ont ouvert la démo au moins une fois</p><table><tr><th>Jour</th><th>Nouveaux appareils</th></tr>';
+function adminStats(){var el=$('adStat');if(!el)return;el.textContent='Mise à jour…';admPost('/admin/stats',{}).then(function(j){if(!j.jours){el.textContent='✗ '+(j.error||'Erreur');return;}
+  var h='<p><b style="font-size:1.6rem;color:#1f6f78">'+j.total+'</b> appareil(s) ont ouvert la démo au moins une fois <span class="tip">· mis à jour à '+new Date().toLocaleTimeString('fr-MA',{hour:'2-digit',minute:'2-digit'})+'</span></p><table><tr><th>Jour</th><th>Nouveaux appareils</th></tr>';
   j.jours.slice(0,14).forEach(function(x){h+='<tr><td>'+x.date+'</td><td>'+x.n+'</td></tr>';});
   el.innerHTML=h+'</table>';}).catch(function(){el.textContent='✗ Serveur injoignable';});}
 function codeRow(c,nom){return '<div class="adc"><code>'+c+'</code>'+assignInputs({nom:nom})+'<button class="btn wa" onclick="adminSend(\''+c+'\',this)">Envoyer sur WhatsApp</button><button class="btn ghost" onclick="copyTxt(\''+c+'\',this)">Copier</button></div>';}
